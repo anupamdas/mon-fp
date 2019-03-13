@@ -1,0 +1,129 @@
+
+
+% Commenting
+\newcommand{\anupam}[1]{{\color{purple}Anupam: #1}}
+\newcommand{\isabel}[1]{{\color{orange}Isabel: #1}}
+\newcommand{\nb}[1]{{\color{blue}NB: #1}}
+\newcommand{\todo}[1]{{\color{red}Todo: #1}}
+
+% Theorems etc.
+\newtheorem{theorem}{Theorem}
+%\newtheorem{maintheorem}{Ma}
+\newtheorem{proposition}[theorem]{Proposition}
+\newtheorem{observation}[theorem]{Observation}
+\newtheorem{conjecture}[theorem]{Conjecture}
+\newtheorem{question}[theorem]{Question}
+\newtheorem{lemma}[theorem]{Lemma}
+%\newtheorem{corollary}{Corollary}
+
+\theoremstyle{definition}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{notation}[theorem]{Notation}
+\newtheorem{remark}[theorem]{Remark}
+\newtheorem{example}[theorem]{Example}
+
+% Formatting
+%\renewcommand{\vec}[1]{\overrightarrow{#1}}
+
+%dotminus command
+\makeatletter
+\newcommand{\dotminus}{\mathbin{\text{\@dotminus}}}
+
+\newcommand{\@dotminus}{%
+	\ooalign{\hidewidth\raise1ex\hbox{.}\hidewidth\cr$\m@th-$\cr}%
+}
+\makeatother
+
+\renewcommand{\emptyset}{\varnothing}
+
+% Basic mathematical sets
+\newcommand{\bool}{\{0,1\}}
+\newcommand{\nat}{\mathbb{N}}
+\newcommand{\mono}{\mathsf{mono}}
+
+% Complexity classes
+\newcommand{\ptime}{\mathbf{P}}
+\newcommand{\fptime}{\mathbf{FP}}
+\newcommand{\posp}{\mathbf{pos}\ptime}
+\newcommand{\posfp}{\mathbf{pos}\fptime}
+\newcommand{\NC}{\mathbf{NC}}
+\newcommand{\AC}{\mathbf{AC}}
+\newcommand{\PH}{\mathbf{PH}}
+
+\newcommand{\logspace}{\mathbf{L}}
+\newcommand{\logtimehier}{\mathbf{LH}}
+
+\newcommand{\lth}{\mathbf{LTH}}
+\newcommand{\flth}{\mathbf{FLTH}}
+\newcommand{\linspace}{\mathbf{LINSPACE}}
+\newcommand{\flinspace}{\mathbf{FLINSPACE}}
+
+% Machines
+\newcommand{\blank}{\square}
+
+
+
+% Operators and basic functions
+\renewcommand{\epsilon}{\varepsilon}
+\newcommand{\comp}{\mathsf{comp}}
+\newcommand{\scomp}{\mathsf{scomp}}
+\newcommand{\prn}{\mathsf{RN}}
+\newcommand{\brn}{\mathsf{BRN}}
+\newcommand{\uprn}{u\prn}
+\newcommand{\ubrn}{u\brn}
+\newcommand{\usbrn}{u\mathsf{SBRN}}
+\newcommand{\srn}{\mathsf{SRN}}
+\newcommand{\br}{\mathsf{BR}}
+\renewcommand{\succ}[1]{\mathsf s_{#1}}
+\newcommand{\smsh}{\#}
+\newcommand{\hlf}[1]{\left\lfloor\frac{#1}{2}\right\rfloor}
+\newcommand{\subtr}{\dotminus}
+
+\newcommand{\nonzero}{\mathit{nonzero}}
+\newcommand{\Leq}{\mathit{leq}}
+\newcommand{\Le}{\mathit{le}}
+
+\renewcommand{\phi}{\varphi}
+\newcommand{\dfn}{:=}
+
+\newcommand{\least}[1]{\succ{}(\mu #1)}
+
+%algebras
+\newcommand{\cob}{\mathsf{C}}
+\newcommand{\uni}[1]{u #1}
+\newcommand{\unicob}{\uni{\cob}}
+\newcommand{\lnalg}{\mathcal{E}^2}
+\newcommand{\bc}{\mathsf B}
+\newcommand{\unibc}{\uni{\mathsf{B}}}
+%logic
+\renewcommand{\models}{\vDash}
+\newcommand{\notmodels}{\nvDash}
+
+% Defined functions
+\newcommand{\cond}{\mathit{cond}}
+\newcommand{\lcond}{\cond_{|\cdot|}}
+
+\newcommand{\bit}{\mathit{bit}}
+\newcommand{\pred}{\mathit{p}}
+\newcommand{\tail}{\mathit{MSP}}
+\newcommand{\msp}{\mathit{msp}}
+\newcommand{\fst}{\mathit{LSP}}
+\newcommand{\lsp}{\mathit{lsp}}
+\newcommand{\length}[1]{{|#1|}}
+\newcommand{\linterleave}{\blacktriangleleft}
+\newcommand{\rinterleave}{\blacktriangleright}
+\newcommand{\pair}[2]{\langle #1 , #2 \rangle}
+
+\newcommand{\unary}[1]{\underline{#1}}
+\newcommand{\parity}{\mathit{par}}
+\newcommand{\concat}{\mathop{\bigodot}}
+\newcommand{\opf}{\mathop{f}}
+\newcommand{\iter}{\mathop{\mathit{iter}}}
+\newcommand{\opcirc}{\mathop{\bigcirc}}
+
+\newcommand{\Val}{\mathit{Val}}
+\newcommand{\val}{\mathit{val}}
+
+
+\newcommand{\sort}{\mathit{sort}}
+\newcommand{\thresh}{\mathit{th}}

@@ -1,0 +1,1862 @@
+
+
+
+\documentclass{lmcs}
+
+
+
+\usepackage{amsthm}
+\usepackage{amsmath}
+\usepackage{amssymb}
+%\usepackage[dvipsnames]{xcolor}
+
+\usepackage{microtype}%if unwanted, comment out or use option "draft"
+
+%\graphicspath{{./graphics/}}%helpful if your graphic files are in another directory
+
+
+
+\input{mon-fp-macros}
+
+\keywords{Monotone complexity,
+	Positive complexity,
+	Function classes,
+	Function algebras,
+	Recursion-theoretic characterisations,
+	Implicit complexity,
+	Logic.}%mandatory
+
+\begin{document}
+
+
+\title{Recursion-theoretic characterisations of some feasible monotone complexity classes}
+%\titlecomment{{\lsuper*}OPTIONAL comment concerning the title, \eg, 
+%  if a variant or an extended abstract of the paper has appeared elsewhere.}
+
+\author[A.~Das]{Anupam Das}	%required
+\address{University of Copenhagen, Denmark}	%required
+\email{anupam.das@di.ku.dk}  %optional
+\thanks{The author is supported by a Marie Sk\l{}odowska-Curie fellowship, \href{http://cordis.europa.eu/project/rcn/209401_en.html}{ERC project 753431}.}	%optional
+
+\author[I.~Oitavem]{Isabel Oitavem}
+\address{CMA and DM, FCT, Universidade Nova de Lisboa}
+\email{oitavem@fct.unl.pt}
+\thanks{This work is partially supported by the Portuguese Science Foundation, FCT, through the projects UID/MAT/00297/2013 and PTDC/\allowbreak MHC-\allowbreak FIL/\allowbreak 2583/\allowbreak 2014.}
+
+
+
+
+\begin{abstract}
+%Following previous work on characterisations of the positive polynomial-time predicates \cite{LautemannSS96:on-pos-p}, we propose a natural and robust notion of the associated function class and give a function algebra that captures it.
+We extend work of Lautemann, Schwentick and Stewart \cite{LautemannSS96:on-pos-p} on characterisations of the `positive' polynomial-time predicates ($\posp$, also called $\mathbf{mP}$ by Grigni and Sipser \cite{Grigni:1992:MC:167687.167706}) to function classes. 
+%They showed that restricting `negation' in various characterisations of $\ptime$ yield the same class of predicates, inducing a robust definition of $\posp$. We observe that many of those results scale to the functional setting too, giving a natural class of functions, $\posfp$, capturing feasible monotone computation. 
+Our main result is the obtention of a function algebra for the positive polynomial-time functions ($\posfp$) by imposing a simple uniformity constraint on the bounded recursion operator in Cobham's characterisation of $\fptime$.
+%We also observe that the tally sets of $\posp$ are precisely the unary codings of $\linspace$ predicates.
+We show that a similar constraint on a function algebra based on \emph{safe recursion}, in the style of Bellantoni and Cook \cite{BelCoo92}, yields an `implicit' characterisation of $\posfp$, mentioning neither explicit bounds nor explicit monotonicity constraints.
+ \end{abstract}
+
+\maketitle
+
+
+\todo{update abstract and intro}
+
+\section{Introduction}
+\label{sect:intro}
+
+\emph{Monotone functions} abound in the theory of computation, e.g.\ sorting a string, and detecting cliques in graphs.
+They have been comprehensively studied in the setting of \emph{circuit complexity}, via $\neg$-free circuits (usually called `monotone circuits'), cf.~\cite{Korshunov:03}.
+Most notably, Razborov's seminal work \cite{Razborov85} gave exponential lower bounds on the size of monotone circuits, and later refinements, cf.~\cite{alon1987monotone,tardos1988gap}, separated them from non-monotone circuits altogether.
+%Indeed several seminal results in circuit complexity concern bounds on the size of $\neg$-free circuits, e.g.\ \cite{Razborov85,alon1987monotone,tardos1988gap}.\todo{expand}
+
+
+The study of \emph{uniform} monotone computation is a much less developed subject. Grigni and Sipser began a line of work studying the effect of restricting `negation' in computational models \cite{Grigni:1992:MC:167687.167706,grigni1991structure}.
+One shortfall of their work
+was that deterministic classes lacked a bona fide treatment, with positive models only natively defined for nondeterminstic classes.
+This means that positive versions of, say, $\ptime$ must rather be obtained via indirect characterisations, e.g.\  as $\mathbf{ALOGSPACE}$.
+%inistic classes did not seem to be as robustly behaved as nondeterministic classes and lacked canonical machine models.
+%While classes such as $\ptime$ could nonetheless be alternatively defined as, say, $ALOGSPACE$, there was still the problem of capturing a good notion of deterministic montone computation.
+%
+Later work by Lautemann, Schwentick and Stewart solved this problem by proposing a model of deterministic computation whose polynomial-time predicates coincide with several characterisations of $\ptime$ once `negative' operations are omitted
+%, inducing a robust definition of `postitive $\ptime$' 
+\cite{LautemannSS96:on-pos-p,LSS98}.
+This induces a robust definition of a class `$\posp$', the \emph{positive} polynomial-time predicates \cite{Grigni:1992:MC:167687.167706,grigni1991structure}.
+
+In this paper we extend this line of work to associated function classes (see, e.g., \cite{CloKra02}), which are of natural interest for logical approaches to computational complexity, e.g.\ \cite{Buss1986,Cook:2010:LFP:1734064}.
+Noting that several of the characterisations proposed by \cite{LautemannSS96:on-pos-p} make sense for function classes (and, indeed, coincide), we propose a \emph{function algebra} for the `positive polynomial-time functions' on binary words ($\posfp$) based on Cobham's \emph{bounded recursion on notation} \cite{Cobham}.
+We show that this algebra indeed coincides with certain characterisations proposed in \cite{LautemannSS96:on-pos-p}, and furthermore give a function algebra based on \emph{safe recursion}, in the style of Bellantoni and Cook \cite{BelCoo92}. The latter constitutes an entirely \emph{implicit} characterisation of $\posfp$, mentioning neither explicit bounds nor explicit monotonicity constraints.
+% in particular the natural generalisation of their deterministic machines to ones with output.
+As far as we know, this is the first implicit approach to monotone computation.
+
+This paper is structured as follows. In Sect.~\ref{sect:mon-fns} we present preliminaries on monotone functions on binary strings and recall some notions of positive computation from \cite{LautemannSS96:on-pos-p,LSS98}. We show also that these models compute the same class of functions (Thm.~\ref{thm:equiv-posfp}), inducing our definition of $\posfp$.
+In Sect.~\ref{sect:unicob} we recall Cobham's function algebra for $\fptime$, based on bounded recursion on notation, and introduce a uniform version of it, $\unicob$, which we show is contained in $\posfp$ in Sect.~\ref{sect:posfp-contains-unicob} (Thm.~\ref{thm:posfp-contains-unicob}).
+In Sect.~\ref{sect:props-unicob} we prove some basic properties about $\unicob$; we characterise the \emph{tally} functions of $\unicob$, those that return unary outputs on unary inputs, as just the unary codings of linear space functions on $\nat$, by giving an associated function algebra (Thm.~\ref{thm:tally-fns-linspace}). 
+We use this to recover a proof that $\unicob$ is closed under a \emph{simultaneous} version of its recursion scheme (Thm.~\ref{thm:sim-ubrn}), tracking the length of functions rather than usual methods relying on explicit pairing functions.
+%We apply these results 
+In Sect.~\ref{sect:unicob-contains-posfp} we show the converse result that $\unicob$ contains $\posfp$ (Thm.~\ref{thm:unicob-contains-posfp}).
+Finally, in Sect.~\ref{sect:safe-recursion} we give a characterisation of $\posfp$ based on `safe' recursion  (Thm.~\ref{thm:unibc-eq-unicob}), and we give some concluding remarks in Sect.~\ref{sect:concs}.
+
+Throughout this work, we follow the convention of \cite{LautemannSS96:on-pos-p,LSS98}, reserving the word `monotone' for the semantic level, and rather using `positive' to describe restricted models of computation.
+
+\section{Monotone functions and positive computation}
+\label{sect:mon-fns}
+\label{sect:posfp}
+
+We consider binary strings (or `words'), i.e.\ elements of $\bool^* = \bigcup\limits_{n \in \nat} \{0,1\}^n$, 
+and for $x \in \bool^n$ we write $x(j)$ for the $j$\textsuperscript{th} bit of $x$, where $j= 0, \dots , n-1$.
+We follow the usual convention that bits are indexed from right (`least significant') to left (`most significant'), e.g.\ as in \cite{CloKra02}; for instance the word $011$ has $0$\textsuperscript{th} bit $1$, $1$\textsuperscript{st} bit $1$ and $2$\textsuperscript{nd} bit $0$. 
+
+We write $\epsilon, \succ 0 , \succ 1 $ for the usual generators of $\bool^*$, i.e.\ $\epsilon$ denotes the empty string, $\succ 0 x = x0$ and $\succ 1 x = x1$.
+We also write $1^n$ for $1$ concatenated with itself $n$ times, for $n\in\nat$.
+
+We consider functions of type $\bool^* \times \cdots \times \bool^* \to \bool^*$.
+For $n\in \nat$, we define $\leq^n $ as the $n$-wise product order of $\leq $ on $\bool$, i.e.\ for $x, y \in \bool^n$ we have $x\leq^n y$ if $\forall j < n .\  x(j) \leq y(j)$.
+%
+%
+The partial order $\leq $ on $\bool^*$ is the union of all $\leq^n$, for $n \in \nat$.
+A function $f : (\bool^* )^k \to \bool^*$ is \emph{monotone} if $x_1 \leq y_1 , \dots , x_k \leq y_k$ $\implies $ $f(\vec x) \leq f(\vec y)$.
+
+%\begin{definition}
+%	[Monotone functions]
+%	$f : (\bool^* )^k \to \bool^*$ is \emph{monotone} if whenever $x_1 \leq y_1 , \dots , x_k \leq y_k$, we have that $f(\vec x) \leq f(\vec y)$.
+%%	We write $\mono$ for the set of all such functions.
+%\end{definition}
+
+%	Notice that, while the precise data structure we use (words, integers etc.) does not typically affect the definition of complexity classes, we need to be careful about this when considering only monotone functions. We will consider only words in this work, \todo{but make comments later?}
+
+
+\begin{example}
+	A recurring example we will consider is the \emph{sorting} function $\sort(x)$, which takes a binary word input and rearranges the bits so that all $0$s occur before all $1$s, left-right.
+%	\footnote{Note that, in this work, we consider the leftmost positions least significant and rightmost positions most significant, in order to be compatible with our machine models.} 
+	Clearly $\sort$ is monotone, and can be given the following recursive definition:
+\begin{equation}
+\label{eqn:sort-non-pos-prog}
+	\begin{array}{rcl}
+\sort (\epsilon) & = & \epsilon \\
+\sort (\succ 0 x) & = &  0\sort(x) \\
+\sort (\succ 1 x) & = & \sort(x)1 
+\end{array}
+\end{equation}
+	While in the binary case it may seem rather simple, we will see that $\sort$ nonetheless exemplifies well the difference between positive and non-positive computation.
+%	 {Indeed, for certain monotone models of computation, such as `sorting networks', the \emph{0-1 principle} ensures that correctly sorting only binary inputs is enough to sort all inputs; see, e.g., \cite{batcher:0-1-princ2011}.}
+\end{example}
+
+
+One particular well-known feature of monotone functions, independent of any machine model, is that they are rather oblivious: the length of the output depends only on the length of the inputs:
+
+\begin{observation}
+	\label{prop:length-obliv}
+	Let $f(x_1, \dots, x_k)$ be a monotone function. 
+	Then, whenever $|x_1| = |y_1|, \dots , |x_k| = |y_k|$, we also have that $|f(\vec x)| = |f(\vec y)|$.
+\end{observation}
+
+\begin{proof}
+	%	[of Prop.~\ref{prop:length-obliv}]
+	%	Notice that $\leq$-comparable words must have the same length and, 
+	%	for $1\leq j\leq k$, consider $n_j=|x_j|=|y_j|$.  
+	Let $n_j = |x_j| = |y_j|$, for $1 \leq j\leq k$.
+	We have both $f(\vec x) \leq f (1^{n_1}, \dots , 1^{n_k})$ and $f(\vec y) \leq f (1^{n_1}, \dots , 1^{n_k})$, by monotonicity, so indeed all these outputs have the same length.
+\end{proof}
+
+
+
+
+%\section{The positive polynomial-time functions: $\posfp$}
+%\label{sect:posfp}
+
+
+One way to define a positive variant of $\fptime$ is to consider $\neg$-free circuits that are in some sense uniform.
+\cite{LautemannSS96:on-pos-p,LSS98} followed this approach too for $\ptime$, showing that one of the strongest levels of uniformity ($\ptime$) and one of the weakest levels (`quantifier-free') needed to characterise $\ptime$ indeed yield the same class of languages when describing $\neg$-free circuits.
+We show that a similar result holds for classes of functions, when allowing circuits to have many output wires.
+Most of the techniques used in this section are standard, so we keep to a high-level exposition, rather dedicating space to examples of the notions of positive computation presented.
+
+We consider $\Delta_0$-uniformity rather than quantifier-free uniformity in \cite{LautemannSS96:on-pos-p,LSS98} since it is easier to present and suffices for our purposes.
+%\footnote{In fact, this is one of the strongest forms of uniformity that makes our argument of Sect.~\ref{sect:unicob-contains-posfp} go through, due to Thm.~\ref{thm:tally-fns-linspace}.}
+(We point out that this subsumes, say, $\logspace$-uniformity, as explained in the Remark below.)
+Recall that a $\Delta_0$ formula is a first-order formula over $\{ 0,1,+,\times, <  \}$ where all quantifiers of the form $\exists x < t$ or $\forall x < t$ for a term $t$.
+A $\Delta_0$-formula $\phi(n_1 , \dots , n_k)$ is interpreted over $\nat $ in the usual way, and naturally computes the set $\{\vec n \in \nat^k : \nat \models \phi (\vec n) \}$.
+%We say that a set $S \subseteq \nat^k$ is $\Delta_0$-\emph{computable} if there is a $\Delta_0$ formula $\phi(n_1 , \dots , n_k)$ with $\nat \models \phi(\vec n) \iff \vec n \in S$.
+
+%For our purposes we will work with the following definition:
+
+%We give `positive' computational models for monotone function classes, following the approach of \cite{LautemannSS96:on-pos-p}.
+%We focus on uniform classes of $\neg$-free circuits and the positive deterministic Turing machines from \cite{LautemannSS96:on-pos-p}, adapted for functions.
+
+\todo{add width measure to definition below}
+
+\begin{definition}
+	[Positive circuits]
+	\label{dfn:circuit-uniformity}
+	A family of \emph{$k$-argument $\neg$-free circuits} is a set $\{ C(\vec n) \}_{\vec n \in \nat^k}$, where each $C(\vec n)$ is a circuit with arbitrary fan-in $\bigvee$ and $\bigwedge$ gates,\footnote{By convention, a $\bigvee$ gate with zero inputs outputs $0$, while a $\bigwedge$ gate with zero inputs outputs $1$.} 
+	%	with $n_1 + \cdots + n_k$ input wires and some (unspecified) number of output wires that are equipped with an ordering.
+	%	
+	%	Such a circuit may be 
+	given as a tuple $(N, D , E, I_1 , \dots , I_k, O )$, where $[N] = \{n<N \}$ is the set of \emph{gates}, $D \subseteq [N]$ is the set of $\bigvee$ gates (remaining gates are assumed to be $\bigwedge$), $E\subseteq [N]\times [N]$ is the set of (directed) edges (requiring $E(m,n) \implies m<n$), $I_j \subseteq [n_j] \times [N]$ contains just pairs $(l,n)$ s.t.\ the $l$\textsuperscript{th} bit of the $j$\textsuperscript{th} input is connected to the gate $n$, and $O\subseteq [N]$ is the (ordered) set of output gates.
+	
+	%	\begin{itemize}
+	%		\item $G$ a set of `gates' that is totally ordered,\footnote{We could have taken a partial order here, but a total order makes the exposition easier later when considering $\Delta_0$-uniform circuit families, and does not lose any generality since every poset can be embedded into a total order.} typically $[N] = \{ n < N \}$.
+	%		\item $D \subseteq G$, the set of arbitrary fan-in $\bigvee$ gates. (The remaining gates are $\bigwedge$).
+	%		\item $E\subseteq G \times G$, the set of edges in the circuit, requiring $E(x,y) \implies x < y$.
+	%		\item $I_j \subseteq [n_j] \times G$, for $j < k$ specifying whether a certain bit of the $j${th} input is connected to a certain gate.
+	%		\item $O \subseteq G$, the set of `output' gates, with the order inherited from $G$.
+	%	\end{itemize}
+	
+	If these sets are polynomial-time computable from inputs $(1^{n_1} , \dots , 1^{n_k})$ then we say the circuit family is \emph{$\ptime$-uniform}.
+	Similarly, we say the family is \emph{$\Delta_0$-uniform} if $N(\vec n)$ is a term (i.e.\ a polynomial) in $\vec n$ and there are $\Delta_0$-formulae $D(n, \vec n), E(m,n, \vec n), I_j (l,n, \vec n), O(n, \vec n)$ computing the associated sets.
+	%	(In this case, without loss of generality, we may assume that $G = [p(\vec n)]$, for some polynomial term $p(\vec n)$.)
+	
+	\todo{Call this instead $\AC^0$ uniform, and make it a statement that $\Delta_0$-uniform is the same.}
+	
+\end{definition}
+
+
+%
+%\todo{make this a definition of $\ptime$- and QF-uniform circuits, then define $\posfp$ after the proposition below.}
+%
+%\anupam{Use $\Delta_0$-uniform instead, due to audience. Also, no need for a set $C$ of conjunction gates: definition with should be equivalent/recoverable from definition without and vice-versa.}
+
+\noindent
+The specification of a circuit family above is just a variant of the usual `direct connection language' from circuit complexity, cf.~\cite{Ruzzo81:on-unif-circ-comp}. Notice that, importantly, we restrict the set $O$ of output gates to depend only on the length of the inputs, not their individual bit-values;
+this is pertinent thanks to Prop.~\ref{prop:length-obliv}.
+Also, when it is convenient, we may construe $I_j$ as a function $[n_j] \to \mathcal P ([N])$, by Currying.
+
+%Another way is to define a positive variant of $\posfp$ is by a machine model where transitions are required to be, in some sense, `monotone'.
+%The definition below is essentially taken from \cite{LautemannSS96:on-pos-p}, adapted to our functional setting.
+
+\begin{remark}
+	\label{rmk:delzer-aczer}
+	$\Delta_0$-sets are well known to be complete for the linear-time hierarchy \cite{Wrathall76:PH+LTH}. However, since we only need to manipulate `unary' inputs in the notion of $\Delta_0$-uniformity above, the circuits generated are actually $\logtimehier$-uniform, where $\logtimehier$ is the logarithmic-time hierarchy, the uniform version of $\AC^0$ \cite{BarImmStrauS90:uniformity-nc1}.
+	See, e.g., \cite{CloKra02} Sect.~6.3 for related discussions on $\logtimehier$ and, e.g., \cite{Cook:2010:LFP:1734064} Sect.~IV.3 for some relationships between $\Delta_0$ and $\AC^0$.
+	\end{remark}
+
+
+\begin{example}
+	[Circuits for sorting]
+	\label{ex:circuits-sort}
+	Let us write $\thresh (j,x)$ for the $(j-1)$\textsuperscript{th} bit of $\sort(x)$, for $1\leq j \leq|x|$. We also set $\thresh(0,x) = 1$ and $\thresh (j , x) = 0 $ for $j > |x|$.
+	Notice that $\thresh(j,x) = 1$ precisely if there are at least $j$ $1$s in $x$, i.e.\ it is a \emph{threshold} function.
+%
+	We assume that the input $j$ is given in unary, for monotonicity, but as an abuse of notation write, say, $j$ rather than $1^j$ throughout this example to lighten the notation.
+	(Later, in Sect.~\ref{sect:props-unicob}, we will be more formal when handling unary inputs.)
+
+\noindent
+We have the following recurrence, for $j>0$:
+\begin{equation}
+\label{eqn:sorting-pos-recurrence}
+	\thresh (j , \succ i x ) = \thresh (j , x) \vee ( i \wedge \thresh(j-1 , x) )
+\end{equation}
+\anupam{this recursion does not induce log-width circuits, even though it does induce deterministic branching programs. How to compute monotone threshold with log-width circuits?}
+
+Notice that this recurrence treats the $i = 0 $ and $i=1$ cases in the `same way'. This corresponds to the notion of \emph{uniformity} that we introduce in our function algebras later.
+	We can use this recurrence to construct polynomial-size $\neg$-free circuits for sorting.
+	For an input $x$ of size $n$, write $x^l$ for the prefix $x(l-1) \cdot  \cdots \cdot x(0)$. 
+	Informally, we construct a circuit with $n+1$ `layers' (numbered $0,\dots , n$), where the $l$\textsuperscript{th} layer outputs $\thresh (n, x^l) \cdot \cdots \cdot \thresh (0,x^l)$; the layers are connected to each other according to the recurrence in \eqref{eqn:sorting-pos-recurrence}, with $\thresh(0,x^l)$ always set to $1$. 
+	Each layer will thus have $2(n+1)$ gates, with $(n+1)$ disjunction gates (computing the functions $\thresh(j,x^l)$), and $n+1$ intermediate conjunction gates.
+	We assign odd numbers to disjunction gates and even numbers to conjunction gates, so that the total number of gates is $N(n) = 2(n+1)^2$ and $D(n) = \{2r+1 : r< (n+1)^2 \}$.
+	The sets $E(r,s, n)$ and $I (r,n)$ can be given a routine description, and the set $O(r,n)$ of output gates consists of just the final layer of disjunction gates (except the rightmost), computing $\thresh (n,x) \cdot \cdots \cdot \thresh (1,x)$, i.e.\ $O(r,n) = \{ 2(n+1)^2 - 2r - 1 : r < n \}$.
+	It is not hard to see that such circuits are not only $\ptime$-uniform, but also $\Delta_0$-uniform. 
+%	See App.~\ref{sect:app:prfs-ex} for a formal construction.
+\end{example}
+
+
+Now we introduce a machine model for uniform positive computation. The definition of a multitape machine below is essentially from \cite{Papadimitriou07}. The monotonicity criterion is identical to that from \cite{LautemannSS96:on-pos-p,LSS98}, though we also allow auxiliary `work' tapes so that the model is easier to manipulate. This also means that we do not need explicit accepting and rejecting states with the further monotonicity requirements from \cite{LautemannSS96:on-pos-p,LSS98}, since this is subsumed by the monotonicity requirement on writing $0$s and $1$s: predicates can be computed in the usual way by Boolean valued functions, with $0$ indicating `reject' and $1$ indicating `accept'.
+
+
+
+\begin{definition}
+	[Positive machines]
+	A $k$-tape (deterministic) \emph{Turing machine} (TM) is a tuple $M = ( Q, \Sigma,   \delta, s, h)$ where:
+	\begin{itemize}
+		\item $Q$ is a finite set of (non-final) \emph{states}.
+		\item $\Sigma \supseteq \{\triangleright, \blank, 0,1\}$ is a finite set, called the \emph{alphabet}.
+		\item $\delta \ :\  Q \times \Sigma^k \ \to \ ( Q \cup \{h\} )\times (\Sigma \times \{\leftarrow , - , \rightarrow \} )^k$ such that, whenever $\delta (q, \sigma_1 , \dots , \sigma_k ) =  (q, \tau_1 , d_1 , \dots , \tau_k , d_k )$, if $\sigma_i = \triangleright$ then $\tau_i  = \triangleright$ and $d_i =\  \rightarrow$.
+		\item $s \in Q$ is the \emph{initial} state.
+		\item $Q$ and $\Sigma $ are disjoint, and neither contains the symbols $h, \leftarrow, - , \rightarrow$.
+	\end{itemize} 
+%	It has $k$ read-only input tapes, in which inputs are stored with beginning/end \emph{markers} $(\triangleleft, \triangleright)$, and a single read-write work tape.
+%	The input alphabet is $\bool$ but the work alphabet, $\Gamma \supseteq \bool$, may contain other symbols too, including a \emph{blank} symbol $\blank$.
+%	%	
+%	$Q$ is a finite set of of \emph{states}, containing the \emph{start} and \emph{halting} states $s$ and $h$ resp.
+%	
+%	Write $D = \{\leftarrow, - , \rightarrow \}$, the set of \emph{directions}.
+\smallskip
+We call $h$ the \emph{final} state, $\triangleright$ the `beginning of tape marker', $\blank$ the `blank' symbol, and $\leftarrow, - , \rightarrow$ are the \emph{directions} `{left}', `{stay}' and `{right}'.
+
+
+\smallskip
+
+
+	%	 
+	Now, write $\mathcal I = Q \times \Sigma^k $ and $\mathcal O = ( Q \cup \{h\} )\times (\Sigma \times \{\leftarrow , - , \rightarrow \} )^k$, so that $\delta $ is a function $ \mathcal I \to \mathcal O$. 
+	We define partial orders $\leq_\mathcal I$ and $\leq_\mathcal O$ on $\mathcal I$ and $\mathcal O$ resp.\ as follows: 
+	\begin{itemize}
+		\item $(q, \sigma_1 , \dots , \sigma_k) \leq_\mathcal I (q' , \sigma_1' , \dots , \sigma_k')$ if $q = q'$ and, for $i = 1 , \dots  ,k$, either $\sigma_i$ = $\sigma_i'$, or both $\sigma_i = 0$ and $\sigma_i' = 1$.
+		\item $(q, \sigma_1 , d_1 , \dots , \sigma_k, d_k ) \leq_\mathcal O (q' , \sigma_1' , d_1' , \dots , \sigma_k' , d_k')$ if $q=q'$ and, for $i=1, \dots , k$, we have $d_i = d_i'$ and either $\sigma_i$ = $\sigma_i'$, or both $\sigma_i = 0$ and $\sigma_i' = 1$.
+	\end{itemize}
+\smallskip
+We say that $M$ is \emph{positive} (a PTM) if $\delta : \mathcal I \to \mathcal O$ is monotone with respect to $\leq_\mathcal I $ and $\leq_\mathcal O$, i.e.\ $I \leq_\mathcal I I' \implies \delta(I) \leq_\mathcal O \delta(I')$.
+	
+	
+%	
+%	and define the following partial orders:
+%	%	 . We define $\leq^\mathcal I $ on $\mathcal I$ as $\{(q,q)\} \times (\{(a,a)\}\cup \{(0,1)\}) \times ( \{(b,b)\} \cup \{0,1\} )$ and also $\leq^\mathcal O$ on $\mathcal O$ as $\{(q,q)\}\times \{(d,d)\}^k \times (\{ (b,b) \} \cup \{ (0,1) \}) \times \{(d,d) \}$.
+%	
+%	
+%	
+%	
+%	\begin{itemize}
+%		\item $\leq_Q $ on $Q$ is just the diagonal, $\{ (q,q) : q \in Q \}$.
+%		\item $\leq_D$ on $D $ is just the diagonal, $\{(d,d) : d \in D \}$.
+%		\item $\leq' $ on $\{0,1,\triangleleft,\triangleright \}$ is $\{ (a, a) : a \in \{ 0,1,\triangleleft,\triangleright\} \} \cup \{ (0,1) \}$. 
+%		\item $\leq_\Gamma $ on $\Gamma$ is $\{ (a, a) : a \in \Gamma \} \cup \{ (0,1) \}$. 
+%		\item $\leq_\mathcal I$ on $\mathcal I$ is the product order $\leq_Q \times 
+%		%		\overbrace{\leq' \times \cdots \times \leq' }^k 
+%		(\leq' )^k
+%		\times \leq_\Gamma$.
+%		\item $\leq_\mathcal O$ on $\mathcal O$ is the product order $\leq_Q \times 
+%		%		\overbrace{\leq^D \times \cdots \times \leq^D}^k 
+%		(\leq_D )^k
+%		\times \leq_\Gamma \times \leq_D$.
+%	\end{itemize}
+%	
+%	
+%	$\delta : \mathcal I \to \mathcal O$ is the \emph{transition function}, and must be {monotone} with respect to $\leq_\mathcal I$ and $\leq_\mathcal O$, i.e.\ it satisfies $I \leq_\mathcal I I' \implies \delta(I) \leq_\mathcal O \delta(I')$.
+	%	
+	
+	\medskip
+	
+	A \emph{run} of input strings $x_1 , \dots , x_k  \in \bool^*$ on $M$ is defined in the usual way (see, e.g., \cite{Papadimitriou07}), beginning from the initial state $s$ and initialising the $i$\textsuperscript{th} tape to $\triangleright x_i \blank^\omega$, for $i= 1 , \dots , k$. If $M$ halts, i.e.\ reaches the state $h$, its \emph{output} is whatever is printed on the $k$\textsuperscript{th} tape at that moment, up to the first $\blank$ symbol.
+	%	\emph{Runs} and \emph{termination} are defined as usual.	
+	%	The output of 
+	%	\todo{halting states and termination}
+	
+%	\smallskip
+	
+	We say that a function $f : (\bool^*)^k \to \bool^* $ is \emph{computable by a PTM} if there is a $k'$-tape PTM $M$, with $k' \geq k$, such that $M$ halts on every input and, for inputs $(x_1 , \dots , x_k, \epsilon, \dots , \epsilon)$, outputs $f(x_1, \dots ,  x_k)$.
+\end{definition}
+
+The monotonicity condition on the transition function above means that the value of a Boolean read does not affect the next state or cursor movements (this reflects the `obliviousness' of monotone functions, cf.~Prop.~\ref{prop:length-obliv}).
+Moreover, it may only affect the \emph{Boolean} symbols printed: the machine may read $0$ and print $0$ but read $1$ and print $1$, in otherwise-the-same situation. However, if in one situation it prints a non-Boolean $\sigma$ when reading a Boolean $0$ or $1$, it must also print $\sigma$ when reading the other.
+
+
+\begin{example}
+	[Machines for sorting]
+        \label{ex:machines-sort}
+	A simple algorithm for sorting a binary string $x$ is as follows: do two passes of $x$, first copying the $0$s in $x$ onto a fresh tape, then appending the $1$s.\footnote{Recall that, while bits are indexed from right to left, machines read from left to right.} However, it is not hard to see that a machine directly implementing this algorithm will not be positive. Instead, we may again use the recurrence from \eqref{eqn:sorting-pos-recurrence}.
+	
+	We give an informal description of a PTM that sorts a binary string.
+%	; a formal construction can be found in App.~\ref{sect:app:prfs-ex}. 
+	The machine has four tapes; the first is read-only and stores the input, say $x$ with $|x|=n$. As in Ex.~\ref{ex:circuits-sort}, we inductively compute $t^l = \thresh(n,x^l)\cdot \cdots \cdot \thresh(0,x^l)$, for $l\leq n$. 
+	The second and third tape are used to temporarily store  $t^l$, while the fourth is used to compute the sorting of the next prefix $t^{l+1}$.
+	At each step the cursors on the working tapes move to the next bit and the transition function implements the recurrence from \eqref{eqn:sorting-pos-recurrence}, calculating the next bit of $t^{l+1}$ and writing it to the fourth tape. Notice that the cursor on the third tape remains one position offset from the cursor on the second and fourth tapes, cf.~\eqref{eqn:sorting-pos-recurrence}. 
+	Once $t^{l+1}$ has been completely written on the fourth tape the machine copies it over the contents of the second and third tapes and erases the fourth tape before moving onto the next bit of the first tape and repeating the process.
+	Finally, once the first tape has been exhausted, the machine copies the contents of the second (or third) tape, except the last bit (corresponding to $\thresh(x,0)=1$), onto the fourth tape and halts.
+\end{example}
+
+\anupam{how much space does the above example use? Replace for a logspace algorithm?}
+
+
+\begin{theorem}
+	\label{thm:equiv-posfp}
+	The following function classes are equivalent:
+	\begin{enumerate}[(1)]
+		\item\label{item:qf-uniform-posfp} Functions on $\bool^*$ computable by $\Delta_0$-uniform families of $\neg$-free circuits.
+				\item\label{item:postm-posfp} Functions on $\bool^*$ computable by multi-tape PTMs that halt in polynomial time.
+		\item\label{item:p-uniform-posfp} Functions on $\bool^*$ computable by $\ptime$-uniform families of $\neg$-free circuits.
+	\end{enumerate}
+\end{theorem}
+
+\todo{similar statement for logspace}
+
+\noindent
+
+This result is similar to analogous ones found in \cite{LautemannSS96:on-pos-p} for positive versions of the predicate class $\ptime$. It uses standard techniques so we give only a sketch of the proof below.
+Notice that the equivalence of models thus holds for any level of uniformity between $\Delta_0$ and $\ptime$, e.g.\ for $\logspace$-uniform $\neg$-free circuits, cf.~the Remark on p.~3.
+
+\begin{proof}
+	[Proof sketch of Thm.~\ref{thm:equiv-posfp}]
+	We show that \eqref{item:qf-uniform-posfp} $\subseteq$ \eqref{item:postm-posfp} $\subseteq $ \eqref{item:p-uniform-posfp} $\subseteq $ \eqref{item:qf-uniform-posfp}.
+	The containments are mostly routine, though \eqref{item:p-uniform-posfp} $\subseteq$ \eqref{item:qf-uniform-posfp} requires some subtlety due to the positivity condition on circuits. For this we rely on an observation from \cite{grigni1991structure}. Let $C(\vec n)$ be a $\ptime$-uniform family of $\neg$-free circuits, specified by polynomial-time programs $N,D,E,I_1, \dots , I_k, O$.
+ Since the circuit-value problem is $\ptime$-complete under even $\AC^0$-reductions (see, e.g., \cite{Cook:2010:LFP:1734064}), we may recover $\Delta_0$-uniform polynomial-size circuits (with negation) computing each of $N,D,E,I_1, \dots , I_k, O$, cf.~the Remark on p.~3.
+	However, these circuits take only unary strings of $1$s as inputs, and so all negations can be pushed to the bottom (by De Morgan laws) and eliminated, yielding input-free $\neg$-free circuits for each of $N,D,E,I_1, \dots , I_k, O$ and their complements (by dualising gates). We may use these as `subcircuits' to compute the relevant local properties of $C(\vec n)$. In particular, every internal gate $n$ of $C(\vec n)$ may be replaced by the following configuration (progressively, beginning from the highest-numbered gate $N(\vec n)-1$):
+	\[
+	\begin{array}{rl}
+	& 
+	\left(
+	\ \ D(n,\vec n)\ \wedge\ \left(\bigvee\limits_{m<n} \left(m \wedge E(m,n,\vec n) \right) \ \ \vee \ \ \bigvee\limits_{j=1}^k \bigvee\limits_{l<n_j} \left( x(l) \ \wedge \ I_j (l,n) \right) \right)
+	 \right) 
+	 \\
+		\vee &  \left(
+		\neg D(n,\vec n)\ \wedge\ 
+		\left(\bigwedge\limits_{m<n} \left( m \vee \neg E(m,n,\vec n) \right)
+		\ \wedge \ 
+		\bigwedge\limits_{j=1}^k \bigwedge\limits_{l<n_j} \left( x(l) \vee \neg I_j (l,n) \right)\right)
+		\right)
+	\end{array}
+	\]
+	This entire construction can be made $\Delta_0$-uniform, upon a suitable renumbering of gates.
+	
+	The proof of \eqref{item:postm-posfp} $\subseteq$ \eqref{item:p-uniform-posfp} follows a standard construction (see, e.g., \cite{Papadimitriou07}), observing that the positivity criterion on PTMs entails local monotonicity and hence allows us to construct circuits that are $\neg$-free. (Similar observations are made in \cite{Grigni:1992:MC:167687.167706,grigni1991structure,LautemannSS96:on-pos-p,LSS98}).
+	Suppose $Q, \Sigma$ and $\{\leftarrow, - , \rightarrow \}$ are encoded by Boolean strings such that distinct elements are incomparable under $\leq$, (except $0\leq 1 $ for $0,1 \in \Sigma$). Thus we may construe $\delta $ as a bona fide monotone Boolean function of fixed input arities, and thus has some (constant-size) $\neg$-free circuit thanks to adequacy of the basis $\{ \bigvee, \bigwedge \}$, say $C_\delta$.
+	Now, on a fixed input, consider `configurations' of the form $(q, x_1, n_1, \dots , x_k, n_k)$, where $q \in Q$, $x_i$ is the content of the $i$\textsuperscript{th} tape (up to the halting time bound) and $n_i$ is the associated cursor position (encoded in unary). 
+	We may use $C_\delta$ to construct polynomial-size $\neg$-free circuits mapping the machine configuration at time $t$ to the configuration at time $t+1$.
+	By chaining these circuits together polynomially many times (determined by the halting time bound), we may thus obtain a circuit that returns the output of the PTM. This entire construction remains $\ptime$-uniform, as usual.
+
+	
+	The proof of \eqref{item:qf-uniform-posfp} $\subseteq $ \eqref{item:postm-posfp} is also routine, building a PTM `evaluator' for $\neg$-free circuits, where $\neg$-freeness allows us to satisfy the positivity condition on TMs. 
+	We rely on the fact that the $\Delta_0$-specifications may be entirely encoded in \emph{unary} on a PTM, so that they are monotone, in polynomial-time.
+	We do not go into details here since, in particular, this containment is subsumed by our later results, Thm.~\ref{thm:posfp-contains-unicob} and Thm.~\ref{thm:unicob-contains-posfp}, which show that \eqref{item:qf-uniform-posfp} $\subseteq$ $\unicob$ $\subseteq$ \eqref{item:postm-posfp}, for the algebra $\unicob$ we introduce in the next section.
+%	
+%	Since the converse result, \ref{item:qf-uniform-posfp} $\implies$ \ref{item:p-uniform-posfp}, is trivial, it remains to show that \ref{item:postm-posfp} is equivalent to the other two models. 
+%	Here 
+%	for which the implications \ref{item:qf-uniform-posfp}$\implies$ \ref{item:postm-posfp} $\implies$ \ref{item:p-uniform-posfp} follow by routine methods.
+%		
+%	We show $1 \implies 2 \implies 3 \implies 1$.
+%	%	
+%	$1 \implies 2$ is trivial, since a formula in $\Delta_0 (\vec n)$ can be evaluated in time polynomial in $n_1 + \cdots + n_k$.
+%	
+%	For $2 \implies 3$, we may use a positive Turing machine to read the length of the inputs and, independent of the bit values, print the description of the circuit for that input type, by simulating the $\ptime$ algorithm producing the circuits. This remains positive since we do not care for individual bit values, only the length.
+%	We then construct an evaluator program, which evaluates this circuit on the given inputs. This is defined in the usual way, locally computing the values at each gate. Positivity of the program is due to the fact that the circuit is $\neg$-free.
+%	
+%	For $3 \implies 1$, we construct $\Delta_0$ formulae describing circuits computing the contents of the output tape at each time instant, and auxiliary circuits that code, with Boolean constants, the configuration of the machine at that instant.
+%	The main circuit is $\neg$-free thanks to the monotonicity condition on the machine, 
+%	though we also need a dualisation operation on the auxiliary circuit; this never needs to negate any actual inputs since it only deals with Boolean constants.
+\end{proof}
+
+\begin{definition}
+	[Positive $\fptime$]
+	The function class $\posfp$ is defined to be the set of functions on $\bool^*$ computed by any of the equivalent models from Thm.~\ref{thm:equiv-posfp}.
+	
+	\todo{also define posFL}
+\end{definition}
+
+
+
+\begin{remark}
+	The notion of \emph{positive} computation was previously studied in \cite{Grigni:1992:MC:167687.167706,LautemannSS96:on-pos-p,LSS98}.
+	One interesting point already noted in those works is that, for a complexity class, its positive version is not, in general, just its monotone members.
+	This follows from a seminal result of Razborov \cite{Razborov85}, and later improvements \cite{alon1987monotone,tardos1988gap}: there are polynomial-time monotone predicates (and hence polynomial-size circuits with negation) for which the only $\neg$-free circuits are exponential in size. In particular, $\posfp \subsetneq \{ f \in \fptime: f \text{ monotone} \}$.
+\end{remark}
+
+
+%% ======================= section 3
+
+\section{An algebra $\unicob$ for $\posfp$} 
+\label{sect:unicob}
+
+\todo{Also give algebra for FL as a special case with log-bounds}
+We present a \emph{function algebra} for $\posfp$ by considering `uniform' versions of recursion operators.
+%
+We write $[\mathcal F ; \mathcal O]$ for the function class generated by a set of initial functions $\mathcal F$ and a set of operations $\mathcal O$, and generally follow conventions and notations from \cite{CloKra02}.
+
+%\subsection{Cobham's function algebra for $\fptime$}
+Let us first recall Cobham's function algebra for the polynomial-time functions,~$\fptime$.
+This algebra was originally formulated over natural numbers, though we work with a version here over binary words, essentially as in \cite{FF,IO97}.
+%
+
+
+Define $\pi^k_j (x_1, \dots, x_k) \dfn x_j$ and $x \smsh y \dfn 1^{|x||y|}$. 
+We write $\comp$ for the operation of function composition. 
+\begin{definition}
+	A function $f$ is defined by \emph{bounded recursion on notation} ($\brn$) from $g, h_0, h_1, k$ if $|f(x, \vec x)| \leq |k(x , \vec x)|$ for all $x, \vec x$ and:
+	\begin{equation}
+	\label{eqn:brn}
+	\begin{array}{rcl}
+	f(\epsilon, \vec x) & \ = \ & g(\vec x) \\
+	%        f(\succ i x , \vec x) & \ = \ & h_i (x, \vec x , f(x, \vec x)) 
+	f(\succ 0 x , \vec x) & \ =\ &  h_0 (x , \vec x , f(x , \vec x)) \\
+	f(\succ 1 x , \vec x) & \ =\ &  h_1 (x , \vec x , f(x , \vec x)) 
+	\end{array}
+	%         f(\epsilon, \vec x)  = g(\vec x)
+	%        \quad 
+	%        ,
+	%        \quad
+	%        f(\succ i x , \vec x)  = h_i (x , \vec x , f(x , \vec x))
+	%        %    	\quad 
+	%        %    	,
+	%        %    	 \quad
+	%        %    	    	f(\succ 1 x , \vec x)  = h_1 (x , \vec x , f(x , \vec x))
+	\end{equation}
+	%	\begin{align*}
+	%	f(\epsilon, \vec x) & = g(\vec x) \\
+	%	f(\succ 0 x , \vec x) & = h_0 (x , \vec x , f(x , \vec x)) \\
+	%	f(\succ 1 x , \vec x) & = h_1 (x , \vec x , f(x , \vec x)) 
+	%	\end{align*}.
+	%
+	We write $\cob$ for the function algebra $[\epsilon, \succ 0, \succ 1 , \pi^k_j , \# ; \comp , \brn ]$.
+\end{definition}
+%The following result is due to Cobham:
+\begin{theorem}
+	[\cite{Cobham}]
+	\label{thm:cobham-fp}
+	$\cob =  \fptime $. 
+\end{theorem}
+
+\noindent
+Notice that $\epsilon, \succ 0 , \succ 1 , \pi^k_j , \smsh$ are monotone, and the composition of two monotone functions is again monotone.
+However, non-monotone functions are definable using $\brn$, for instance: 
+%$C(\epsilon ,y_\epsilon, y_0,y_1) = y_\epsilon$,  $C(\succ 0 x ,y_\epsilon, y_0,y_1) = y_0$ and $C(\succ 1 x ,y_\epsilon, y_0,y_1) = y_1$. 
+\begin{equation}
+\label{eqn:conditional}
+\begin{array}{rcl}
+\cond(\epsilon,y_\epsilon, y_0,y_1) & \ = \ & y_\epsilon \\
+\cond(\succ 0 x,y_\epsilon, y_0,y_1) & \ = \ & y_0 \\
+\cond(\succ 1 x,y_\epsilon, y_0,y_1) & \ = \ & y_1 
+\end{array}
+\end{equation}
+\noindent
+This `conditional' function is definable since we do not force any connection between $h_0 $ and $h_1$ in \eqref{eqn:brn}.
+Insisting on $h_0 \leq h_1$ would retain monotonicity, but this condition is external and not generally checkable.
+Instead, we can impose monotonicity implicitly by
+somewhat `uniformising' $\brn$.
+%
+First, we will need to recover certain monotone variants of the conditional:
+
+
+
+\begin{definition}
+	[Meets and joins]
+	We define $x\wedge y=z$ by $|z| = \min (|x|,|y|)$ and $z(j) = \min (x(j) , y(j))$, for $j< \min (|x|,|y|)$.
+	We define analogously $x\vee y = z$ by $|z| = \max (|x|,|y|)$ and $z(j) = \max (x(j) , y(j))$, for $j< \max (|x|,|y|)$.
+\end{definition}
+Note that, in the case of $x \vee y$ above, if $|x|<|y|$ and $|x|\leq j< \max (|x|,|y|)$, then $x(j)$ is not defined and we set $z(j)=y(j)$. We follow an analogous convention when $|y|<|x|$.
+
+\begin{definition}
+        [The function algebra $\unicob$]
+	%[Uniform $\brn$]
+      	We say that 
+        a function is defined by \emph{uniform bounded recursion on notation} 
+	($\ubrn$)  from $g, h, k$ if $|f(x, \vec x)| \leq |k(x , \vec x)|$ 
+	for all $x, \vec x$ and:
+	\begin{equation}
+	\label{eqn:ubrn}
+	\begin{array}{rcl}
+	f(\epsilon, \vec x) & \ = \ & g(\vec x) \\ 
+	f(\succ 0 x , \vec x) & \ =\ &  h (0, x , \vec x , f(x , \vec x)) \\
+	f(\succ 1 x , \vec x) & \ =\ &  h (1, x , \vec x , f(x , \vec x)) 
+	\end{array}
+        \end{equation}
+        We define $\unicob $ to be the function algebra $[\epsilon, \succ 0, \succ 1 , \pi^k_j, \# , \wedge, \vee ; \comp , \ubrn ]$.
+\end{definition}
+
+Notice that $\wedge$ and $\vee$ are clearly $\fptime$ functions, therefore they are in $\cob$. Moreover, notice that \eqref{eqn:ubrn} is the special case of 
+	\eqref{eqn:brn} when $h_i (x, \vec x , y)$ has the form $h(i, x , \vec x , y)$. So, we have that $\unicob\subseteq\cob = \fptime$. We will implicitly use this observation later to ensure that the outputs of $\unicob$ functions have lengths which are polynomially bounded on the lengths of the inputs.
+
+
+%For the same reasons explained in Sect.~\ref{sect:prelude}, 
+
+
+
+The main result of this work is 
+%the following:
+%\begin{theorem}
+%	\label{thm:unicob-equals-posfp}
+%	$\unicob = \posfp$.
+%\end{theorem}
+that $\unicob = \posfp$.
+The two directions of the equality are proved in the sections that follow, in the form of Thms.~\ref{thm:posfp-contains-unicob} and \ref{thm:unicob-contains-posfp}.
+%Before that, we first remark upon some properties of our algebra $\unicob$.
+Before that, we make some initial observations about $\unicob$.
+\begin{proposition}
+	$\unicob$ contains only monotone functions.
+\end{proposition}
+\begin{proof}
+	The proof is by induction on the definition of $f$. 
+	The relevant case is when $f$ is defined by $u\brn$. 
+	It suffices to show that $f$ is monotone in its first input, which we do by induction on its length. Let $w \leq x$. If $|w| = |x| = 0$, then they are both $\epsilon$ and we are done. Otherwise let $w = \succ i w'$ and $x = \succ j x'$.
+	Then $f(w , \vec y ) = h( i , w' , \vec y , f(w' , \vec y) ) \leq h(j , x' , \vec y , f(x' , \vec y))$ by the inductive hypothesis, since $i\leq j$ and $w' \leq x'$, and we are done. 
+\end{proof}
+
+\begin{proposition}
+	$\unicob +\cond = \cob$.\footnote{Here we write $[\mathcal F; \mathcal O] + f$ for the function algebra $[\mathcal F,f;\mathcal O]$.}
+\end{proposition}
+\begin{proof}
+	The left-right inclusion follows from the definition of $\cond$ by $\brn$ in \eqref{eqn:conditional}. For the right-left inclusion, we again proceed by induction on the definition of functions in $\cob$, and the relevant case is when $f$ is defined by $\brn$, say from $g,h_0 ,h_1 ,k$. 
+	In this case, we may recover a definition of $f$ using $\ubrn$ by writing $h(i , x , \vec x , y) = \cond (i, g(\vec x), h_0 (x, \vec x , y), h_1 (x, \vec x , y ))$.
+	%	Consider $f' \in\unicob$ defined by $u\brn$ based on $g,h,k$, with 
+	%	$$h(w , x, \vec x , z) = \cond (w , g(\vec x) , h_0 (x, \vec x , z) , h_1 (x, \vec x , z ) ).$$
+\end{proof}
+
+%$\unicob$ contains only monotone functions; 
+%%by the same argument as Prop.~\ref{prop:cond+unirec=rec}, 
+%moreover, we have that $\unicob + \cond = \cob$.
+%%(see App.~\ref{app:sect:unicob}).
+%%
+As expected, 
+$\unicob$ contains the usual predecessor function, least significant parts, concatenation, and a form of iterated predecessor:
+%, due to the following definitions by $\ubrn$: 
+%$\pred (\epsilon) = \epsilon$ and $\pred (\succ i x) = x$; 
+%$x\cdot\epsilon = x$ and $x \cdot (\succ i y) = \succ 0 (x\cdot y) \vee i$; 
+%$\msp(\epsilon,y) = y$ and $\msp(\succ i x , y) = \pred ( \msp (x,y))$.
+
+% Obviously, for all $x,y$, $|xy|=|x|+|y|$ and $|\msp (x,y)|=|y|\subtr |x|$, i.e.\ $\max (0, |y|-|x|)$.
+\begin{proposition}
+	[Basic functions in $\unicob$]
+	$\unicob$ contains the following functions:\footnote{Notice that we could have equivalently defined $\lsp (x) $ as $x \wedge 1$.}
+	\[
+	\arraycolsep=1.2pt
+	\begin{array}{rcl}
+	\pred (\epsilon) & \dfn & \epsilon \\
+	\pred (\succ i x ) & \dfn & x
+	\end{array}
+	\quad
+	\begin{array}{rcl}
+	\lsp (\epsilon ) & \dfn & \epsilon \\
+	\lsp (\succ i x) & \dfn & i
+	\end{array}
+	\quad
+	\begin{array}{rcl}
+	x \cdot \epsilon & \dfn & x \\
+	x \cdot (\succ i y) & \dfn & \succ i (x\cdot y)
+	\end{array}
+	\quad
+	\begin{array}{rcl}
+	\msp (|\epsilon| , y) & \dfn & y \\
+	\msp (|\succ i x| , y) & \dfn & \pred (\msp (|x|,y))
+	\end{array}
+	\]
+\end{proposition}
+\begin{proof}
+	All these definitions are instances of $\ubrn$, with bounding function $\# (\succ 1 x,\succ 1 y)$.
+\end{proof}
+Notice that, in the above definition of concatenation and throughout this work, we write $\succ i x$ for $\succ 0 x \vee i$. We also sometimes simply write $xy$ instead of $x \cdot y$.
+
+
+We may also extract individual bits
+%, defining $\bit (x, y) \dfn \msp (x,y) \wedge 1$, 
+and test for the empty string in:
+%, defining $\cond_\epsilon (\epsilon ,y,z) = y$ and 
+%$\cond_\epsilon (\succ i x ,y,z) = z$.
+
+%Using these basic functions, we may extract individual bits of inputs. Moreover, even though we do not have the general conditional function in $\unicob$, we may still define a simple case distinction on whether an input is $\epsilon$ or not.
+%
+%
+%\todo{make below plain text}
+\begin{proposition}
+	[Bits and tests]
+	\label{prop:bits-and-tests-in-unicob}
+	$\unicob$ contains the following functions:
+	\[
+	\bit (|x| , y) \dfn \lsp (\msp (|x|, y) )
+	\qquad
+	\arraycolsep=1.5pt
+	\begin{array}{rcl}
+	\cond_\epsilon (\epsilon ,y,z) &\dfn& y 
+	\\
+	\cond_\epsilon (\succ i x ,y,z) &\dfn& z
+	\end{array}
+	\]
+	%	The function $\bit (|x|,y)$ returning the $|y|\subtr |x|$th 
+	%        bit of $y$, and the function $	\cond_\epsilon$, such that 
+	%        $\cond_\epsilon (\epsilon ,y,z) = y$ and 
+	%        $\cond_\epsilon (\succ i x ,y,z) = z$, are both in $\unicob$.     
+\end{proposition}
+%\begin{proof}
+%	We define $\bit (|x|,y) = \lsp (\msp (x,y))$, and $\cond_\epsilon$ is trivially defined by flat $\ubrn$.
+%\end{proof}
+%One reason we will use this conditional later on is to turn certain $\{\epsilon , 1 \}$-valued functions into analogous $\{0,1\}$-valued functions. 
+%Notice that the other direction, however, is not possible, due to length obliviousness of monotone functions.
+%
+%\medskip
+
+
+
+
+%% ============ section 4 ==================
+
+\section{$\posfp$ contains $\unicob$}
+\label{sect:posfp-contains-unicob}
+
+
+One direction of our main result follows by standard techniques:
+\begin{theorem}
+	\label{thm:posfp-contains-unicob}
+	$\unicob \subseteq \posfp$.
+\end{theorem}
+
+%We give some example cases, specifying the various required sets from Dfn.~\ref{dfn:circuit-uniformity}.
+
+It is not hard to see that one can extract (uniform) $\neg$-free circuits from a $\unicob$ program,
+% (see App.~\ref{sect:app:prfs-ex}), 
+ but we instead give a PTM for each function of $\unicob$.
+
+%\todo{put into one argument later on?}
+%
+%For the sake of example, we sketch the case of $\ubrn$.
+
+\begin{proof}
+	[Proof sketch of Thm.~\ref{thm:posfp-contains-unicob}]
+The proof is by induction on the function definitions. We prove that for all $f\in\unicob$ there exists a PTM $M_f$ computing $f$ in polynomial time.
+%
+For the initial functions the result is straightforward, and composition is routine.
+% (see App.~\ref{sect:app:prfs-ex}). 
+
+We give the important case of when $f$ is defined by $\ubrn$ from functions $g,h,k \in \unicob$, as in \eqref{eqn:ubrn}; we will assume there are no side variables $\vec x$, for simplicity, though the general case is similar. 
+%	\begin{equation}
+%	\begin{array}{rcl}
+%	f(\epsilon, \vec x) & \ = \ & g(\vec x) \\ 
+%	f(\succ 0 x , \vec x) & \ =\ &  h (0, x , \vec x , f(x , \vec x)) \\
+%	f(\succ 1 x , \vec x) & \ =\ &  h (1, x , \vec x , f(x , \vec x)) 
+%	\end{array}
+%        \end{equation}
+%where $|f(x, \vec x)| \leq |k(x , \vec x)|$, for some function $k\in\unicob$, and for all $x, \vec x$. 
+Let $|f(x)| \leq b(|x| )$ for some polynomial $b(n)$ (since, in particular, $f(x)  \in \cob = \fptime$). 
+%In the following we omit the side variables $\vec x$.
+ By the inductive hypothesis, there are PTMs $M_g$ (with $t$ tapes) and $M_h$ (with $3+u$ tapes) computing, respectively, $g$ and $h$ in time bounded by $p_g (n)$ and $p_h(1,m,n)$ for inputs of lengths $n$ and $(1,m,n)$, respectively, for appropriate polynomials $p_g,p_h$. 
+% Thus, $M_h$ on the relevant inputs, i.e.\ on $(i,x,f(x))$ for $i\in\{ 0,1\}$, runs in time bounded by $p_h (1, |x|, b(|x|))$. 
+We assume that $M_g$ and $M_h$ halt scanning the first cell of each tape. In case of $M_h$ we also assume that the content of tapes $1$ and $2$ are not changed during the computation (i.e.\ are read-only), and that the machine halts with the output in tape $3$ with the other $u$ tapes empty. 
+We may define an auxiliary machine, $M$, with 3 tapes. Whenever the recursion input $x$ is on tape 1, every time we run $M$, it writes the two first inputs of a call to $h$ on tapes 2 and 3 and shifts the cursor in $x$ one bit along.
+ This means that a bit of $x$ will be on tape 2 and a prefix of $x$, up to that bit, will be on tape 3.
+%
+%
+%\anupam{Don't think this works. I tried running it on $101$.}
+%\isabel{I assumed that before aplying M the state is reset to s. I made that explicit in the instruction (2) below}
+%\todo{fix table above, and put in example earlier to be called here.}
+%
+\noindent
+Such $M$ may be constructed so that it is a positive TM which works in time bounded by $2|x|+1$. 
+%(see App.~\ref{sect:app:prfs-ex} for a construction). 
+
+Now, we describe a positive TM $M_f$ (with $3+u+t$ tapes) computing $f$ as follows:
+%, with $x$ on tape 1: 
+\begin{enumerate}
+\item
+Run $M_g$ (over the last $t$ tapes of $M_f$);
+\item
+Enter state $s$, run $M$ (over tapes 1-3), and if $M$ reaches state $H$, halt;
+\item
+Run $M_h$ (over tapes $2$,$3$, $3+u+t$, and tapes $4$ to $u+3$ of $M_f$, in this order);
+\item
+Go to (2).
+\end{enumerate}
+
+\noindent
+Each run of $M$ shifts the cursor of the input tape one cell to the right, so, as expected, it halts after $|x|$ repetitions of the loop above, and hence operates in polynomial time. 
+%Thus, $M_f$ calls $M_g$ once, $M$ $|x|+1$ times, and $M_h$ $|x|$ times. So, knowing that all mentioned machines run in polynomial time, also $M_f$ does. 
+%Finally, $M_f$ is a positive machine since 
+\end{proof}
+
+
+\todo{Point out that only logspace is used when only log-BRN is being simulated.}
+
+
+%% ============== section 5 ==============
+
+\section{Some properties of the algebra $\unicob$}
+\label{sect:props-unicob}
+We conduct some `bootstrapping' in the algebra $\unicob$, both for self-contained interest and also for use later on to prove the converse of Thm.~\ref{thm:posfp-contains-unicob} in Sect.~\ref{sect:unicob-contains-posfp}.
+%The techniques 
+
+
+%We will use variables $m,n,$ etc.\ to vary over $\nat$ (distinguished from $x,y,$ etc.\ for binary words).
+
+\subsection{An algebra for lengths: tally functions of $\unicob$ and linear space}
+We characterise the \emph{tally functions} of $\unicob$, i.e.\ those with unary inputs and outputs, as just the unary codings of functions on $\nat$ computable in linear space.
+We carry this argument out in a recursion-theoretic setting so that the exposition is more self-contained.
+
+%We already know from Prop.~\ref{prop:length-obliv} that the length of the output of a function depends only on the lengths of the inputs. 
+%
+%
+%
+To distinguish functions on $\nat$ from functions on $\{0,1\}^*$, we use variables $m,n$ etc.\ to vary over $\nat$.
+We will also henceforth write $\unary n$ for $1^n$, to lighten the presentation when switching between natural numbers and binary words.
+
+
+\smallskip
+
+Further to Prop.~\ref{prop:length-obliv}, for functions in $\unicob$ we may actually compute output lengths in a simple function algebra over $\nat$.
+\begin{definition}
+	%	[An algebra for lengths]
+	Let $0, 1 ,+, \times, \min , \max $ have their usual interpretations over $\nat$.
+	$f(n, \vec n)$ is defined by \emph{bounded recursion}, written $\br$, from $g, h , k$ if $f(n,\vec n) \leq k(n,\vec n)$ for all $n , \vec n$ and:
+	\[
+	\begin{array}{rcl}
+	f(0,\vec n) & \ =\  & g(\vec n) \\
+	f(n+1 , \vec n) & \ =\  & h ( n, \vec n , f(n, \vec n))
+	\end{array}
+	\]
+	%	
+	We write $\lnalg$ for the function algebra $ [0, 1, +, \times , \min, \max, \pi^k_j ; \comp , \br ]$ over $\nat$.
+\end{definition}
+
+%The following is well-known:
+
+\noindent
+Let us write $\flinspace$ for the class of functions on $\nat$ computable in linear space (see, e.g., \cite{CloKra02}).
+The following result is well-known:
+\begin{proposition}
+	[\cite{Ritchie1963}]
+	$\lnalg = \flinspace$.
+	%	\footnote{We write $\flinspace$ for the functions on $\nat$ computable in linear space (see \cite{CloKra02}).}
+\end{proposition}
+\todo{What is the class of functions log-BR, arising from log-BRN? somewhere between FALINTIME and FLINSPACE.}
+
+\noindent
+For a list of arguments $\vec x = (x_1, \dots , x_k)$, let us write $|\vec x|$ for $(|x_1|, \dots , |x_k|)$.
+%The following result is proved by induction on the structure of programs:
+\begin{lemma}
+	\label{lem:computing-lengths}
+	For $f(\vec x)\in \unicob$,
+	there is a $l_f(\vec n) \in \lnalg$ such that $ |f(\vec x)| = l_f(|\vec x|)  $.
+	%	\footnote{For a list of arguments $\vec x = x_1, \dots , x_k$, we write $|\vec x|$ for $|x_1|, \dots , |x_k|$.
+	%	 and $\unary{|\vec x|}$ for $\unary{|x_1|}, \dots , \unary{|x_k|}$.}
+\end{lemma}
+
+\begin{proof}
+	%	[of Lemma~\ref{lem:computing-lengths}]
+	We proceed by induction on the definition of $f$ in $\unicob$.
+	For the initial functions we have:	
+	$| \epsilon | =  0$, 
+	$| \succ 0 x| = |x| + 1$, 
+	$| \succ 1 x| = |x| + 1$, 
+	$|x \smsh y | = |x| |y|$, 
+	$| \pi^k_j  (x_1 , \dots , x_n)| = |x_j|$, 
+	$|x \wedge y| = \min(|x|, |y|)$, and 
+	$| x \vee y | = \max (|x|, |y|)$.
+	
+	If $f$ is defined by composition, the result is immediate from composition in $\lnalg$. 
+	Finally, if $f(x, \vec x )$ is defined by $\ubrn$ from functions $g,h,k \in \unicob$, as in \eqref{eqn:ubrn},
+%	\[
+%	\begin{array}{rcl}
+%	f(\epsilon, \vec x) & = & g(\vec x) \\
+%	f(\succ i x , \vec x) & = & h(i, x , \vec x , f(x, \vec x))
+%	\end{array}
+%	\]
+%	where $|f(x, \vec x)| \leq |k(x, \vec x)|$ for all $ x, \vec x$, 
+	then we have,
+	\[
+	\begin{array}{rcl}
+	|f(\epsilon, \vec x)| & = & |g(\vec x)| \\
+	|f(\succ i x , \vec x)| & = & |h(1 , x , \vec x , f(x , \vec x))|
+	\end{array}
+	\]
+	and we may define $l_f$ by $\br$ from $l_g$, $l_h$ and $l_k$, by the inductive hypothesis.
+	%	(whose existence is ensured by induction hypothesis). 
+\end{proof}
+
+
+%Notice that, by combining Lemma~\ref{lem:computing-lengths} above and Cor.~\ref{cor:unary-arith-fns}, we have the following:
+%We arrive at a characterisation of the tally functions of $\unicob$:
+
+\noindent
+By appealing to the lengths of $\epsilon, \succ 1, \cdot, \smsh, \wedge, \vee, \ubrn$, we also have a converse result to Lemma~\ref{lem:computing-lengths} above, giving the following characterisation of the tally functions of $\unicob$:
+%
+
+
+\begin{theorem}
+	%	[Tally functions of $\unicob$]
+	\label{thm:tally-fns-linspace}
+	Let $f : \nat^k \to \nat$. Then the binary string function $\unary{f(| \vec x |)}$ is in $\unicob$ if and only if the natural number function $f(\vec n)$ is in $ \lnalg$.
+\end{theorem}
+
+
+\begin{proof}
+		[Proof sketch]
+	The left-right implication follows from Lemma~\ref{lem:computing-lengths} above, and the right-left implication follows by simulating $\lnalg$-definitions with unary codings in $\unicob$.
+	%	$(\Leftarrow )$ It is straightforward, by induction on function definitions in $\lnalg$.
+	%	
+	%	$(\Rightarrow)$ Notice first that whenever $g\in\unicob$, we have $g(\vec x)\# 1\in\unicob$, i.e.~$\unary{|g(\vec x)|}\in\unicob$. The result is then also straightforward.
+\end{proof}
+
+
+%We will use the above result crucially in later sections to encode basic arithmetic on unary integers and also to conclude that $\unicob$ is closed under a \emph{simultaneous} version of $\brn$, despite pairing being problematic.
+
+\noindent
+Thanks to this result, we will rather work in $\lnalg$ when reasoning about tally functions in $\unicob$, relying on known facts about $\flinspace$ (see, e.g., \cite{CloKra02}).
+%Notice that we could have done this already for Thm.~\ref{thm:half+par}, using iterated sums instead of iterated concatenations, but 
+
+%\todo{mention links between $\lnalg$ and $\unicob$, e.g.\ iterating functions, some base functions etc. I have put this all in the appendix for now.}
+
+\smallskip
+
+In $\unicob$, we may also use unary codings to `iterate' other functions.
+We write $f(\unary{\vec n}, \vec y) \in \unicob$  if there is $f'(\vec x, \vec y ) \in \unicob$ such that $f'(\unary{\vec n}, \vec y) = f(\unary{\vec n}, \vec y)$, for all $\vec n \in \nat$.
+% for all $\vec n , \vec x$.
+
+\begin{observation}
+	[Length iteration]
+	\label{prop:length-iteration}
+	$\unicob$ is closed under the \emph{bounded length iteration} operation: we may define $f(\unary n , \vec x)$ from $g(\vec x)$, $h(\unary n , \vec x , y)$ and $k(\unary{n},\vec x)$ as:
+	\[
+	\begin{array}{rcl}
+	f(\unary 0 , \vec x) & \ \dfn \ & g(\vec x) \\
+	f(\unary{n+1} , \vec x) & \ \dfn \ & h(\unary n , \vec x , f(\unary n , \vec x))
+	\end{array}
+	\]
+	as long as $|f(\unary{n},\vec x)|\leq |k(\unary{n},\vec x)|$.
+\end{observation}
+
+%\todo{explain what we mean when using unary argument in typed functions}
+\noindent
+In fact, bounded length iteration is just a special case of $\ubrn$, and we will implicitly use this when iterating functions by length.
+This is crucial for deriving closure properties of $\unicob$, as in the next subsection, and for showing that $\unicob \supseteq \posfp$ in Sect.~\ref{sect:unicob-contains-posfp}.
+
+
+%Now, from this lemma we directly obtain the following result:
+\begin{remark}[Some iterated functions]
+	\label{rmk:iter-fns}
+%	The  length iteration proposition enables us to define directly several functions in $\unicob$. Namely, 
+For 
+	$h(x,\vec x) \in \unicob$, the following functions are in $\unicob$:
+	\[
+	\begin{array}{c}
+	\begin{array}{rcl}
+	\bigvee\limits_{j <|x|} h(j,\vec x) & \dfn & h\left( \unary{|x|-1}, \vec x \right)  \vee \cdots \vee h\left(\unary{0}, \vec x\right) \\
+	\bigwedge\limits_{j<|x|} h(j,\vec x) & \dfn & h\left( \unary{|x|-1}, \vec x \right)  \wedge \cdots \wedge h\left(\unary{0}, \vec x\right) 
+	\end{array}
+	\qquad
+	\begin{array}{rcl}
+	\bigvee x & \dfn & \bigvee\limits_{j < |x|} \bit\left( j, x\right) \\
+	\noalign{\medskip}
+	\bigwedge x & \dfn & \bigwedge\limits_{j < |x|} \bit\left( j, x\right)
+	\end{array}
+\\
+\noalign{\medskip}
+	\bigodot\limits_{j <|x|} h(j,\vec x) \quad  \dfn  \quad h\left( \unary{|x|-1}, \vec x \right)  \cdot \cdots \cdot h\left(\unary{0}, \vec x\right)
+	\end{array}
+	\]
+	
+	
+	\noindent
+	Notice that, as for the definitions of $\bigvee x$ and $\bigwedge x$ above, we may use iterated operators with various limit formats, implicitly assuming that these are definable in $\unicob$.
+\end{remark}
+
+\begin{example}
+	[A program for sorting]
+	Notice that the recurrence in \eqref{eqn:sort-non-pos-prog}, while an instance of $\brn$, is not an instance of $\ubrn$, since it is not uniform. 
+	However, we may give a positive definition by $\ubrn$ based, once again, on the recurrence \eqref{eqn:sorting-pos-recurrence}:
+	\[
+	\begin{array}{rcl}
+	\sort(\epsilon) & = & \epsilon \\
+	\sort(\succ i x) & = & \concat\limits_{j < |x|} \left( \bit ( j+1 , \succ 1 \sort (x) ) \vee (i \wedge \bit ({j} , \succ 1  \sort (x)))\right)
+	\end{array}
+	\]
+\end{example}
+
+
+\subsection{$\unicob$ is closed under simultaneous $\ubrn$}
+To exemplify the robustness of the algebra $\unicob$ it is natural to show closure under certain variants of recursion. 
+While we do not explicitly use these results later, the technique should exemplify how other textbook-style results may be obtained for $\unicob$. We also point out that the ideas herein are implicitly used in Sect.~\ref{sect:unicob-contains-posfp} where we inline a treatment of a restricted version of `course-of-values' recursion.
+
+One of the difficulties in reasoning about $\unicob$ is that it is not clear how to define appropriate (monotone) (de)pairing functions, which are usually necessary for such results.
+%
+Instead, we rely on analogous results for $\lnalg$, before `lifting' them to $\unicob$, thanks to Thm.~\ref{thm:tally-fns-linspace} and Prop.~\ref{prop:length-obliv}.
+We give a self-contained exposition for the benefit of the reader but, since $\flinspace$ and algebras like $\lnalg$ are well known, we will proceed swiftly; see, e.g., \cite{CloKra02} for more details.
+
+%Now that we have `bootstrapped' many functions on $\nat$ in $\lnalg$, we may define a pairing function and its associated projections.
+
+Notice that we have the following functions in $\lnalg$,
+\[
+%\begin{array}{rcl}
+%n \subtr m & \dfn & \max (n-m , 0) \\
+%\cond_0 (x,y,z) & \dfn & \begin{cases}
+%y & \text{if $x = 0$} \\
+%z & \text{otherwise}
+%\end{cases}
+%\end{array}
+n \subtr m  \dfn  \max (n-m , 0) 
+\qquad \text{and} \qquad 
+\cond_0 (x,y,z) \dfn \begin{cases}
+y & \text{if $x = 0$} \\
+z & \text{otherwise}
+\end{cases}
+\]
+thanks to Thm.~\ref{thm:tally-fns-linspace} and the fact that $\msp (|x|, y)$ and $\cond_\epsilon$ are in $\unicob$.
+%, thanks to $\br$ in $\lnalg$, 
+Thus
+we may define,
+\[
+%\begin{array}{rcl}
+%\Le (m,n) & \dfn & \begin{cases}
+%0 & \text{if $n \subtr m = 0$}\\
+%1 & \text{otherwise}
+%\end{cases}
+%\\
+%\noalign{\smallskip}
+%\hlf{n}
+%&\dfn& 
+%\sum\limits_{i<n} \Le ({{2i+1}} , n )
+%\end{array}
+\Le (m,n) \ \dfn \ \begin{cases}
+0 & \text{if $n \subtr m = 0$}\\
+1 & \text{otherwise}
+\end{cases}
+\qquad\text{and}\qquad
+\hlf{n}
+\ \dfn\  
+\sum\limits_{i<n} \Le ({{2i+1}} , n )
+\]
+%where
+%$\Le (m,n) = 0$ if $n\subtr m = 0$, and $1$ otherwise.\footnote{That $\cond_0 \in \lnalg$ is a simple application of $\br$, but also a consequence of Thm.~\ref{thm:tally-fns-linspace}.}		
+%\(
+%\Le (m,n) \  \dfn \ 
+%\begin{cases}
+%0 & n \subtr m =0 \\
+%1 & \text{otherwise}
+%\end{cases}
+%\)
+%	
+%	It results from the proposition above considering $g(u,x)=\bit (u\concat u,x)$, which is clearly in $\unicob$ and, for $u=1^i$, leads to $\bit (1^i \concat 1^i ,x)$ i.e. $ \bit(1^{2i} , x)$.
+%	\todo{show iterated concatenation by recursion}
+%	
+%
+by bounded recursion.
+This allows us to define in $\lnalg$ a simple pairing function:
+\begin{proposition}
+	[Pairing in $\lnalg$]
+	\label{prop:pairing}
+	The following function is in $\lnalg$:
+	$$\pair{ n_0}{ n_1}
+	\dfn
+	{\hlf{( {n_0+n_1} )({n_0+n_1+1})} + n_0}$$
+\end{proposition}
+%
+%\begin{definition}
+%	[Length pairing]
+%	We define in $\lnalg$:
+%	\[
+%	\pair{ n_0}{ n_1}
+%	\quad \dfn \quad
+%	{\hlf{( {n_0+n_1} )({n_0+n_1+1})} + n_0}
+%	\]
+%	We also define $\beta_i (\pair{ n_0}{ n_1}) \dfn {n_i}$.
+%\end{definition}
+%
+%\noindent
+
+We now show that we have the analogous \emph{depairing} functions, due to the fact that bounded minimisation is available in $\flinspace$.
+
+\begin{lemma}
+	[Bounded minimisation, \cite{Grzegorczyk1953}]
+	\label{lem:bdmin}
+	$\lnalg$ is closed under \emph{bounded minimisation}:
+	if $f(n , \vec n) \in \lnalg$ then so is the following function:
+	\[
+	\least {m < n }. (f(m,\vec n) = 0 )\quad  \dfn \quad
+	\begin{cases}
+	m+1 & \text{$m<n$ is least s.t.\ $f(m, \vec n) = 0$} \\
+	0 & \text{$f(m, \vec n) > 0$ for all $m<n$}
+	\end{cases}
+	\]
+\end{lemma}
+\begin{proof}
+	Appealing to $\br$, we have $\least {m < 0} .( f(m , \vec n ) = 0 ) =  0$ and,
+	\[
+	\begin{array}{rl}
+	& \ \least {m < n+1} .( f(m, \vec n ) = 0) \\
+	\noalign{\smallskip}
+	= & 
+	%	\begin{array}{rcl}
+	%	\least m < 0 . f(m , \vec n ) = 0 & = & 0 \\
+	%	\least m < n+1 . f(m, \vec n ) = 0 & = & 
+	\begin{cases}
+	n+1 & \text{if $\least{m < n }. (f(m, \vec n ) = 0) =0$ ,  $f(n,\vec n) = 0$}\\
+	0 & \text{if $\least {m < n }. (f(m, \vec n ) = 0) = 0$ ,  $f(n,\vec n) \neq 0$}\\
+	\least {m < n} . (f(m, \vec n ) = 0) & \text{if $\least {m < n} . (f(m, \vec n )=0 )\neq 0$ }
+	\end{cases}
+	%	\end{array}
+	\end{array}
+	%\begin{array}{ll}
+	%	n+1 & \text{if $\least m < n . f(m, \vec n ) = 0$ and $f(n,\vec n) = 0$}\\
+	%0 & \text{if $\least m < n . f(m, \vec n ) = 0$ and $f(n,\vec n) \neq 0$}\\
+	%\least m < n . f(m, \vec n ) = 0 & \text{if $\least m < n . f(m, \vec n ) \neq 0$ }
+	%\end{array}
+	\]
+	by two applications of the conditional $\cond_0$.
+\end{proof}
+
+%
+%\begin{lemma}
+%	[Inversion]
+%	\label{lem:inversion-general}
+%	Suppose $f(n_1, \dots , n_k) \in \lnalg$ is injective. Then, for $j = 1, \dots , k$, there are $f^{-1}_j (n) \in \lnalg$ such that $f^{-1}_j (f(\vec n)) = n_j$, for all $\vec n \in \nat^k$.
+%\end{lemma}
+%
+%
+%\begin{proof}
+%%	[of Lemma~\ref{lem:inversion-general}]
+%	We must first define the bounded minimisation operator: For functions $g$ and $g'$ in $\lnalg$, the function given by 
+%	$$\mu_{n_j < n} (\exists n_0 , \cdots ,n_{j-1},n_{j+1} ,\cdots ,n_{k-1} <n \quad  g(n_0,\cdots ,n_{k-1} ,n) = g'(n_0,\cdots ,n_{k-1} ,n))$$ is in $\lnalg$. Considering $g(n_0,\cdots ,n_{k-1} ,n) = f(n_0,\cdots ,n_{k-1})$ and $g'(n_0,\cdots ,n_{k-1} ,n)=n$, the result is immediate. 
+%\end{proof}
+
+\begin{proposition}
+	[Depairing]
+	\label{prop:depairing}
+	For $i\in \bool$, the function $\beta_i$ with $\beta_i (\pair{ n_0}{ n_1}) = {n_i}$ is in $\lnalg$.
+\end{proposition}
+\begin{proof}
+	We have $\beta_0 (n) = \least {n_0 < n }. (\least {n_1 < n }. (\pair{n_0}{n_1} = n ) \neq 0) \ \subtr \ 1$, which is definable by bounded minimisation and appropriate conditionals.\footnote{Notice that $\pair{n_0}{n_1} = n$ iff $\max (\pair{n_0}{n_1} \subtr n , n \subtr \pair{n_0}{n_1} ) = 0$.}
+	$\beta_1 (n)$ is defined analogously, by switching $\least {n_0 <n}$ and $\least {n_1<n}$.
+\end{proof}
+
+
+
+Thanks to (de)pairing, we have the following (well-known) result:
+\begin{proposition}
+	\label{prop:sim-br}
+	$\lnalg$ is closed under \emph{simultaneous bounded recursion}: 
+	we may define $f_1 , \dots , f_p $ from $g_1, h_1, k_1 \dots , g_p , h_p , k_p$ if $f_j (n , \vec n) \leq k_j (n, \vec n)$ for all $n, \vec n$, for $1 \leq j \leq p$, and:
+	\[
+	\begin{array}{rcl}
+	f_j (0 , \vec n) & = & g_j (\vec n) \\
+	f_j (n + 1 , \vec n) & = & h_j ( n , \vec n , f_1 (n , \vec n) , \cdots , f_p (n, \vec n ))
+	\end{array}
+	\]
+\end{proposition}
+%\begin{proof}
+%	The proof is straightforward, using the pairing and deparing functions that we have just introduced in $\lnalg$.
+%\end{proof}
+%\todo{expand statement above, and give textbook proof.}
+
+\noindent
+This result, along with Lemma~\ref{lem:computing-lengths}, allows us to show that $\unicob$ is closed under the simultaneous form of $\ubrn$, by using \emph{concatenation} instead of pairing:
+
+\begin{theorem}
+	\label{thm:sim-ubrn}
+	$\unicob$ is closed under \emph{simultaneous} $\ubrn$: we may define $f_1 , \dots , f_p $ from $g_1, h_1, k_1 \dots , g_p , h_p , k_p$ if $|f_j (x, \vec x)| \leq | k_j (x, \vec x)|$ for all $x, \vec x$, for $1 \leq j \leq p$, and:
+	\[
+	\begin{array}{rcl}
+	f_j (\epsilon , \vec x) & = & g_j (\vec x) \\
+	f_j (\succ i x , \vec x) & = & h_j (i, x , \vec x , f_1 (x , \vec x) , \dots , f_p (x, \vec x ))
+	\end{array}
+	\]
+%	as long as $|f_j (x , \vec x)| \leq |k_j (x, \vec x)|$ for all inputs $x, \vec x$.
+\end{theorem}
+\begin{proof}
+	[Proof sketch]
+	For $1\leq j\leq p$, we have $g_j, h_j, k_j$ are in $\unicob$, therefore by  Lemma~\ref{lem:computing-lengths} there exist, in $\lnalg$, functions $l_{g_j}, l_{h_j}$ and $l_{k_j}$ computing their output lengths in terms of their input lengths. Appealing to simultaneous bounded recursion (Prop.~\ref{prop:sim-br}), we may define in the natural way functions $l_{f_j} \in \lnalg$ such that $|f_j (x,\vec x)|=l_{f_j} (|x|,|\vec x|)$ for all $x, \vec x$.
+	%	Evoking Thm.~\ref{thm:tally-fns-linspace}, consider $l_{f_j} (\unary{|x|},\unary{|\vec x|})$ in $\unicob$ with output $\unary{l_{f_j} (|x|,|\vec x|)}$.
+	
+	Now, using concatenation, we define the following function in $\unicob$ by $\ubrn$,
+	\[
+	\begin{array}{rcl}
+	F (\epsilon , \vec x) & = & g_1 (\vec x)\cdot\cdots\cdot  g_p (\vec x) \\
+	F (\succ i x , \vec x) & = & h_1 (i, x , \vec x , \vec F(x , \vec x) ) \cdot\cdots\cdot h_p (i, x , \vec x , \vec F(x , \vec x) ),
+	\end{array}
+	\]
+	where $\vec F = (F_1 , \dots F_p)$ and each $ F_j (x,\vec x)$ is $F(x,\vec x)$ without its leftmost $l_{f_1} (|x|,|\vec x|) +\cdots +l_{f_{j-1}} (|x|,|\vec x|)$ and its rightmost $l_{f_{j+1}} (|x|,|\vec x|)+\cdots +l_{f_p} (|x|,|\vec x|)$ bits, i.e., 
+	$$
+	F_j (x,\vec x) =\msp \left({l_{f_{j+1}} ({|x|},{|\vec x|})}+\cdots+ {l_{f_p} ({|x|},{|\vec x|})}, F(x,\vec x) \right) \wedge \unary{l_{f_{j}} ({|x|},{|\vec x|})}
+	$$
+	The bounding function is just the concatenation of all the $k_j (x, \vec x)$, for $1\leq j\leq p$.
+	Now we may conclude by noticing that $f_j (x, \vec x) = F_j (x , \vec x)$, for $1\leq j\leq p$.
+	% These operations can be defined in $\unicob$ by iterating concatenation and $\bit$ appropriately, cf.~Prop.~\ref{prop:length-iteration}. 
+	%	
+	%	\todo{ Use Prop.~\ref{prop:sim-cvr-br} to first calculate `in advance' the lengths of each $f_j$, then construct the function that concatenates all $f_j$ by usual $\ubrn$. Use the fixed lengths to extract each component using bit and concatenation.}	
+\end{proof}
+
+%
+%We also have that $\unicob$ is closed under an appropriate version of \emph{course-of-values recursion}.
+%
+%\begin{theorem}
+%	$\unicob$ is closed under uniform bounded course-of-values recursion on notation:
+%	we may define $f$ from $g, h , k $ as follows:
+%	\[
+%	\begin{array}{rcl}
+%	f(0, \vec x) & \dfn & g(\vec x) \\
+%	f(x , \vec x) & \dfn & h\left(i, x, \vec x , \bigodot\limits_{y\prec x} f(y,\vec x)  \right)
+%	\end{array}
+%	\]
+%	as long as $|f(x,\vec x)| \leq |k(x,\vec x)|$.
+%	(Here, we write $y\prec x$ for ``$y$ is a (strict) prefix of $x$''.)
+%\end{theorem}
+%
+%Notice that, although we do not have pairing/sequencing constructions in $\unicob$ the notion of course-of-values recursion on notation above indeed reflects the intended definition, due to the fact that we may compute the lengths in advance, as for Thm.~\ref{thm:sim-ubrn} above.
+%
+%\begin{proof}
+%	\todo{Similar to case of simultaneous recursion.}
+%\end{proof}
+
+%
+%\begin{corollary}
+%	The function,
+%	\[
+%	\parity ( |x|)
+%	\quad = \quad 
+%	\begin{cases}
+%	0 & \text{$|x|$ is even} \\
+%	1 & \text{$|x|$ is odd}
+%	\end{cases}
+%	\]
+%	is in $\unicob$.
+%\end{corollary}
+%\begin{proof}
+%	\todo{follows from theorem and proposition above.}
+%\end{proof}
+%
+%More generally notice that, thanks to length conditionals, we have that any $\{\epsilon , 1 \}$-valued function can be turned into an analogous $\{0,1\}$-valued function.
+%The other direction, however, is not true, due to length obliviousness.
+
+
+
+
+%% =============== section 6 ==============
+
+\section{$\unicob$ contains $\posfp$}
+\label{sect:unicob-contains-posfp}
+
+
+We are now ready to present our proof of the converse to Thm.~\ref{thm:posfp-contains-unicob}.
+%, constituting the right-left inclusion of Thm.~\ref{thm:unicob-equals-posfp}. 
+For this we appeal to the characterisation \eqref{item:qf-uniform-posfp} from Thm.~\ref{thm:equiv-posfp} of $\posfp$ as $\Delta_0$-uniform families of $\neg$-free circuits.
+%
+%For this we first need to show that we can express every $\Delta_0$ predicate in $\unicob$.
+%In fact, we will later show a more general result that $\lnalg$ computes precisely the functions of the `linear-time hierarchy', which subsumes this fact, but for the moment we keep the exposition self-contained.
+%
+%\begin{lemma}
+%	[Characteristic functions of $\Delta_0$ sets]
+%	Let $\phi (\vec x)$ be a $\Delta_0$ formula with all free variables indicated.
+%	There is a function $f_\phi(\vec x) \in \unicob$ such that:
+%	\[
+%	f_\phi(\vec n)
+%	\ = \ 
+%	\begin{cases}
+%	\epsilon & \nat \notmodels \phi (\vec n) \\
+%	1 & \nat \models \phi (\vec n)
+%	\end{cases}
+%	\]
+%\end{lemma}
+%\begin{proof}
+%	First, let us notice that we have functions computing any terms in unary, due to Prop.~\ref{prop:arithmetic-unary} and Cor.~\ref{cor:unary-arith-fns}.
+%	We proceed by induction on the structure of $\phi$.
+%	\begin{itemize}
+%		\item If $\phi $ is $s \neq t$ then we define $f_\phi ( \vec x ) \dfn \bigwedge \unary{\max (s \subtr t , t \subtr s)}$.
+%		
+%		\anupam{Define $\bigwedge $ above as a case of iteration when doing the iteration lemma.
+%			Otherwise, case for $s=t$ commented below.}
+%		
+%		%		\item If $\phi$ is $s = t$, then
+%		%%		, using length conditional 
+%		%		we define:
+%		%		\[
+%		%		f_\phi (\vec x)
+%		%		\ \dfn \ 
+%		%		\begin{cases}
+%		%			1 & 		\unary{\max (s \subtr t , t \subtr s) } = \epsilon \\
+%		%			\epsilon & \text{otherwise}
+%		%		\end{cases}
+%		%		\]
+%		\item If $\phi $ is $\neg \psi$ then we define:
+%		\[
+%		f_\phi ( \vec x)
+%		\ \dfn \ 
+%		\begin{cases}
+%		1 & f_\psi(\vec x) = \epsilon \\
+%		\epsilon & \text{otherwise}
+%		\end{cases}
+%		\]
+%		\item If $\phi$ is $\psi \wedge \chi$ then we define:
+%		\[
+%		f_\phi ( \vec x)
+%		\ \dfn \ 
+%		f_\psi (\vec x) \wedge f_\chi ( \vec x)
+%		\]
+%		\item If $\phi $ is $\forall x < t . \psi (x)$ then we first define,
+%		\[
+%		\begin{array}{rcl}
+%		f_\phi' (\epsilon, \vec x ) & \dfn & 1 \\
+%		f_\phi' (\succ i x , \vec x) & \dfn & f_\psi (x, \vec x) \wedge f_\phi'(x, \vec x)
+%		\end{array}
+%		\]
+%		by $\ubrn$.
+%		Now we may set $f_\phi ( \vec x) \dfn f_\phi' (t)$.
+%	\end{itemize}
+%\end{proof}
+%
+Since $\Delta_0$ formulae compute just the predicates of the linear-time hierarchy, the following result is not surprising, though we include it for completeness of the exposition:
+\begin{lemma}
+	[Characteristic functions of $\Delta_0$ sets]
+	\label{lem:char-fns-delzer}
+	Let $\phi $ be a $\Delta_0$-formula with free variables amongst $\vec n$.
+	There is a function $f_\phi(\vec n) \in \lnalg$ such that:
+	\[
+	f_\phi(\vec n)
+	\ = \ 
+	\begin{cases}
+	0 & \nat \notmodels \phi (\vec n) \\
+	1 & \nat \models \phi (\vec n)
+	\end{cases}
+	\]
+\end{lemma}
+
+\begin{proof}
+	%	[of Lemma~\ref{lem:char-fns-delzer}]
+	We already have functions for all terms (written $s,t,$ etc.), i.e.\ polynomials, due to the definition of $\lnalg$.
+	We proceed by induction on the structure of $\phi$, which we assume by De Morgan duality is written over the logical basis $\{ \neg, \wedge, \forall \}$: 
+	%	with only relational symbol $\leq$:	
+	\begin{itemize}
+		\item For atomic formulae we use the length conditional to define appropriate functions:
+		\[
+		f_{s<t} (\vec n )
+		\ \dfn \ 
+		\begin{cases}
+		1 & s \subtr (t+1) = 0 \\
+		0 & \text{otherwise}
+		\end{cases}
+%		\]
+%		\item If $\phi$ is $s = t$, then
+%		%		, using length conditional 
+%		we define $f_\phi$, using the conditional, as follows:\footnote{Alternatively we could define $f_{s=t} (\vec n) \dfn \neg (s< t) \wedge \neg( t< s)$, avoiding any use of $\max$. }
+%		\[
+\qquad
+		f_{s=t} (\vec n)
+		\ \dfn \ 
+		\begin{cases}
+		1 & 		{\max (s \subtr t , t \subtr s) } = 0 \\
+		0 & \text{otherwise}
+		\end{cases}
+		\]
+		\item If $\phi $ is $\neg \psi$ then we define $f_\phi$, using the conditional, as follows:
+		\[
+		f_\phi ( \vec n)
+		\ \dfn \ 
+		\begin{cases}
+		1 & f_\psi(\vec n) = 0 \\
+		0 & \text{otherwise}
+		\end{cases}
+		\]
+		\item If $\phi$ is $\psi \wedge \chi$ then we define $f_\phi$ as follows: 
+		$$f_\phi ( \vec n)\ \dfn \ 
+		%		f_\psi (\vec n) \wedge f_\chi ( \vec n)
+		%		$, i.e.~
+		%		$
+		\min (f_\psi (\vec n) , f_\chi ( \vec n))
+		$$
+		\item If $\phi $ is $\forall n < t . \psi (n,\vec n)$ then we define $f_\phi (t , \vec n)$, by $\br$, as follows:
+		\[
+		\begin{array}{rcl}
+		f_\phi (0, \vec n ) & \dfn & 1 \\
+		f_\phi ( n + 1 , \vec n) & \dfn & \min \left(f_\psi (n, \vec n) ,  f_\phi(n, \vec n) \right)
+		\end{array}
+				\qedhere
+		\] 
+
+	\end{itemize}
+\end{proof}
+
+
+\noindent
+Using this result, we may argue for the converse of Thm.~\ref{thm:posfp-contains-unicob}.
+\begin{theorem}
+	\label{thm:unicob-contains-posfp}
+	%	If a family of positive Boolean circuits is $\Delta_0$-uniform, then it is computed by a function in $\unicob$.
+	$\posfp \subseteq \unicob$.
+\end{theorem}
+
+
+
+\begin{proof}
+	Working with the characterisation \eqref{item:qf-uniform-posfp} from Thm.~\ref{thm:equiv-posfp} of $\posfp$, we use Lemma~\ref{lem:char-fns-delzer} above to recover characteristic functions of sets specifying a $\neg$-free circuit family $C(\vec n)$ in $\lnalg$.
+	Writing $N, D, E, I_1 , \dots , I_k, O$ for the associated characteristic functions (in $\lnalg$), we define an `evaluator' program in $\unicob$, taking advantage of Thm.~\ref{thm:tally-fns-linspace}, that progressively evaluates the circuit as follows.
+	%	
+	%	Suppose are characteristic functions (in $\vec n$) of the sets specifying polynomial-size $\neg$-free circuits $C(\vec n)$.
+	Given inputs $\vec x$ of lengths $\vec n$, we will define a function $\Val(\unary n , \vec x)$ that returns the concatenation of the outputs of the gates $< n$ in $C(\vec n)$, by length iteration, cf.~Obs.~\ref{prop:length-iteration}.
+	
+	The base case of the iteration is simple, with $\Val(\unary 0 , \vec x) \dfn \epsilon$.
+	For the inductive step we need to set up some intermediate functions.
+	%	
+	Suppressing the parameters $\vec n$, we
+%	First let us 
+	define the function $\iota (\unary n , \vec x)$ returning the concatenation of input bits sent to the $n$\textsuperscript{th} gate: 
+%	where we write $\concat$ for length-iterated concatenation, cf.~Rmk.~\ref{rmk:iter-fns}:
+	\[
+	\iota (\unary n , \vec x)
+	\ \dfn \ 
+		\concat\limits_{m<|x_1|} \left(\unary{I_1 ( m, n)} \wedge \bit (\unary m , x_1) \right)
+	\cdot \  \cdots \ \cdot
+		\concat\limits_{m<|x_k|} \left(\unary{I_k (m,n)} \wedge \bit (\unary m , x_k) \right)
+	\]
+	
+	%	The base case for the definition of $\Val$ is as follows:
+	%	\[
+	%	\Val (\unary 0 , \vec x)
+	%	\ \dfn \ 
+	%	\begin{cases}
+	%	\bigwedge \iota (\unary 0 , \vec x) & D(\unary 0) = \unary 0 \\
+	%	 \bigvee \iota (\unary 0 , \vec x) & D(\unary 0) = \unary 1 \\
+	%	\end{cases}
+	%	\]
+	
+	\noindent
+	Now we define the value $\val (\unary{n}, \vec x)$ of the $n$\textsuperscript{th} gate in terms of $\Val (\unary n , \vec x)$, appealing again to the iterated operators from Rmk.~\ref{rmk:iter-fns}, and testing for the empty string:\footnote{Formally, here we follow the usual convention that $\bigvee \epsilon = 0 $ and $\bigwedge \epsilon = 1$.}
+	%	\footnote{Here we write  
+	%		$\bigvee x \dfn  \bigvee\limits_{j < |x|} \bit(\unary j, x)$ and
+	%		$\bigwedge x  \dfn  \bigwedge\limits_{j < |x|} \bit(\unary j, x)$.}
+	\[
+	\val (\unary{n},\vec x)
+	\ \dfn\ 
+	\begin{cases}
+	\bigwedge \iota (\unary{n}, \vec x) \ \wedge \  \bigwedge\limits_{m<n} \left(\unary{\left(1 \subtr E(m , n)\right)} \vee \bit (\unary m  , \Val (\vec n , \vec x)) \right) & \quad \text{if $\unary{D( n)} = \unary 0$}\\
+	\bigvee \iota (\unary{n}, \vec x) \ \vee \ \bigvee\limits_{m<n} \left( \hspace{1.25em} \unary{E( m, n)} \hspace{1.25em} \wedge \bit (\unary m , \Val (\vec n , \vec x))\right) &\quad \text{if $\unary{D( n)} = \unary 1$}
+	\end{cases}
+	\]
+	Finally we may define $\Val\left(\unary{n+1}, \vec x\right) \dfn \val (\unary n , \vec x) \cdot \Val (\unary n , \vec x)$.
+	%	
+	At this point we may define the output $C(\vec x)$ of the circuit as $\concat\limits_{m<N} \left( \unary{O( m)} \wedge \bit (\unary m , \Val (\unary {N} , \vec x) ) \right)$.
+	%	, where $N$ is actually $N(|{\vec x}|)$.
+\end{proof}
+
+\anupam{here, talk about width at the same time, to recover an evaluater using only log-brn in the case of log-width circuits.}
+
+%% ================ section 7 ==============
+
+\section{A characterisation based on safe recursion}
+\label{sect:safe-recursion}
+In \cite{BelCoo92} Bellantoni and Cook give an \emph{implicit} function algebra for $\fptime$, not mentioning any explicit bounds, following seminal work by Leivant, \cite{Leivant91:delin-comp:feas,Leivant94:delin-ptime}, who first gave a \emph{logical} implicit characterisation of $\fptime$.
+%
+In this section we give another function algebra for $\posfp$ in the style of Bellantoni and Cook's, using `safe recursion'. 
+Our argument follows closely the structure of the original argument in \cite{BelCoo92};
+% replacing $\mathsf B $ for $\unibc$ and $\cob$ for $\unicob$; 
+ it is necessary only to verify that those results go through once an appropriate uniformity constraint is imposed.
+We write normal-safe functions as usual: $f(\vec x; \vec y)$ where $\vec x$ are the \emph{normal} inputs and $\vec y$ are the \emph{safe} inputs.
+
+\begin{definition} 
+  [Function algebra $\unibc$] 
+	We say that $f$ is defined by \emph{safe composition}, written $\scomp$, from functions $g,\vec r,\vec s$ if: 
+	$
+	f (\vec x; \vec y ) = g(\vec r(\vec x;);\vec s(\vec x;\vec y))
+	$.
+	We say that $f$ is defined by \emph{uniform safe recursion on notation} ($u\srn$) from functions $g$ and $h$ if: 
+	\[
+	\begin{array}{rcl}
+	f (\epsilon ,\vec x; \vec y ) & = & g(\epsilon ,\vec x;\vec y)\\
+	f (\succ i x,\vec x; \vec y ) & = & h( x,\vec x ; i, \vec y , f(x,\vec x;\vec y))
+	\end{array}
+	\]
+	%	\end{enumerate}
+\end{definition}
+
+We define $\unibc \dfn [\epsilon, \succ 0^{;1}, \succ 1^{;1}, \pi^{l;k}_j , \wedge^{;2} , \vee^{;2}, \pred^{;1} , \cond^{;3}_{\epsilon} ; \scomp , u\srn]$. Here, superscripts indicate the arity of the function, which we often omit.
+%
+We will show that the normal part of $\unibc$ computes precisely $\posfp$, following the same argument structure as \cite{BelCoo92}.
+
+\begin{lemma}
+  [Bounding lemma]
+	\label{lem:safe-bounding-poly}
+	For all $f\in \unibc$, there is a polynomial $b_f (\vec m , \vec n)$ (with natural coefficients)  such that, for all $\vec x , \vec y$, $  |f(\vec x;\vec y)|\leq b_f (|\vec x|, |\vec y|).$
+\end{lemma}
+
+\begin{proof}
+	%	[of Lemma~\ref{lem:safe-bounding-poly}]
+	[Proof idea]
+	We show by that for $f\in \unibc$, by induction on its definition, there exists a polynomial $q_f(\vec n)$ such that, for all $\vec x , \vec y$, $ |f(\vec x;\vec y)|\leq q_f (|\vec x|) + \max_j (| y_j|)$.
+	(This is just a special case of the same property for $\mathsf B$ from \cite{BelCoo92}.)
+\end{proof}
+
+
+\begin{proposition}
+	\label{prop:unicob-contains-unibc}
+	%	For all $f\in\unibc$ there exists $f'\in\unicob$ such that 
+	%	$$\forall\vec x,\vec y \quad f(\vec x;\vec y)=f'(\vec x, \vec y).$$
+	If $f(\vec x ; \vec y) \in \unibc$, then we have $f(\vec x , \vec y) \in \unicob$.
+\end{proposition}
+
+\begin{proof}
+	%	[of Prop.~\ref{prop:unicob-contains-unibc}]
+	[Proof sketch]
+	We proceed by induction on the definition of $f$; the only interesting case is when $f$ is defined by $u\srn$. In this case we define $f$ analogously to $u\brn$, taking the bounding function to be $\unary{b_f (|\vec x|, |\vec y|) }$,
+%	 by Thm.~\ref{thm:tally-fns-linspace}, 
+	 where $b_f$ is obtained from Lemma~\ref{lem:safe-bounding-poly} above.
+\end{proof}
+
+
+
+Therefore we have that $\unibc$ is contained in $\unicob$, and consequently in $\posfp$. In order to establish the other inclusion we slightly reformulate the function algebra $\unicob$.
+We write
+$\unicob' \dfn [\epsilon , s_0 , s_1 , \pi^n_j , \wedge , \vee ; \comp , \ubrn' ]$, where $\ubrn'$ is defined as $\ubrn$ but with the bounding polynomial $k\in [\epsilon , s_1 , \pi^{n}_j , \cdot , \# ; \comp ]$.
+%
+It is clear that $\unicob$ is contained in $\unicob'$; namely the function $\#$ can easily be defined (as in, e.g., the proof of Prop.~\ref{prop:unibc-contains-unicob} later). We will prove that $\unicob'$ is contained in $\unibc$.
+
+\begin{lemma}
+	\label{lem:safe-normal-bounding}
+	For all $f\in\unicob'$ there is a polynomial $p_f(n)$ and some $f' (w;\vec x)\in\unibc$ such that, for all $\vec x , w$, $ (|w|\geq p_f (|\vec x|) \Rightarrow f(\vec x)=f'(w;\vec x))$.
+	%	$$\forall \vec x \forall w \quad |w|\geq p_f (|\vec x|) \Rightarrow f(\vec x)=f'(w;\vec x). \quad \quad (*)$$
+\end{lemma}
+
+
+\begin{proof}
+	[Proof sketch]
+	%	[of Lemma~\ref{lem:safe-normal-bounding}]
+	The proof is similar to the proof of the analogous statement for $\fptime$ given in \cite{BelCoo92}, with routine adaptations to deal with uniformity. We proceed by induction on the definition of $f$ in $\unicob'$, with the interesting case being when $f$ is defined by $\ubrn'$, say from functions $g,h$ and $k$. Let $g', p_g, h'$ and $p_h$ be the appropriate functions and polynomials obtained by the inductive hypothesis. We would like to define $f'\in \unibc$ and a polynomial $p_f$ such that, for all $w,x,\vec x$, whenever $|w|\geq p_f(|x|,|\vec x|)$ one has $f(x,\vec x)=f'(w;x,\vec x)$. The problem is that in $\unibc$, due to the normal-safe constraints, one cannot define $f'$ directly by recursion on $x$. Therefore we introduce in $\unibc$ some auxiliary functions. Define,
+	\[
+	\begin{array}{rcl}
+	\msp (|\epsilon | ; y ) & \dfn & y \\
+	\msp (|\succ i x | ; y ) & \dfn & p (;\msp (|x|;y))
+	\end{array}
+	\qquad
+	\begin{array}{rcl}
+	\msp (|x|,y; ) & \dfn & \msp (|x|;y) \\
+	X(z,w ; x) & \dfn & \msp (|\msp (|z|,w;)|;x) \\
+	I(z,w ; x) &\dfn & X(\succ 1  z,w;x)\wedge 1
+	\end{array}
+\]
+by $\uni\srn$ and by safe composition.
+	%	
+	The function $X$ is used to `simulate' the recursion over $x$, with $x$ in a safe input position. 
+	%	
+	Now, by $\uni\srn$, we define $F(\epsilon ,w ; x,\vec x)  \dfn \epsilon$ and,
+	\begin{equation}
+	\label{eqn:srn-mimics-brn}
+	\begin{array}{rl}
+	& F(\succ i z, w ; x,\vec x)  \\
+	\noalign{\smallskip}
+	\dfn & 
+	\begin{cases}
+	g'(w;\vec x) & \text{if $X(\succ 1 z,w;x) = \epsilon$ } \\
+	h'(w;I(z,w;x),X(z,w;x),\vec x,F(z,w;x,\vec x)) & \text{otherwise}
+	\end{cases}
+	\end{array}
+\end{equation}
+	using a length conditional, cf.~Prop.~\ref{prop:bits-and-tests-in-unicob}.
+	From here we set
+	$
+	%	\begin{array}{rcl}
+	f'(w ; x) 
+	%	& 
+	\dfn 
+	%	& 
+	F(w,w;x,\vec x)
+	%	\end{array}
+	$
+	and also,
+	\[
+	\begin{array}{rcl}
+	p_f (|x|,|\vec x|) & \dfn & p_h (1,|x|,|\vec x|,b_f(|x|,|\vec x|))+p_g (|\vec x|)+|x|+1,
+	\end{array}
+	\]
+	where $b_f$ is a polynomial bounding the length of the outputs of $f$ (which exists since $f \in \unicob'$.)
+	
+	Given $x,\vec x$, take $w$ such that $|w|\geq p_f  (|x|,|\vec x|)$. 
+	We will prove, by subinduction on $|u|$, that, if $|w|-|x|\leq |u|\leq |w|$, then $F(u,w;x,\vec x) = f(X(u,w;x),\vec x)$. Since $X(w,w;x) = x$, we thus obtain that $f'(w;x,\vec x) = F(w,w;x,\vec x) = f(x,\vec x)$, as required.
+	
+	Let us take an arbitrary $u$ such that $|w|-|x|\leq |u|\leq |w|$. Note that  $|w|-|x|\geq 1$, and thus we may write $u=\succ i z$ for some $z$. We have two cases:
+	\begin{itemize}
+		\item
+		If $|\succ i z| = |w|-|x|$ then $X(\succ i  z,w;x) = \epsilon$, and so $F(\succ i  z,w;x,\vec x) = g'(w;\vec x) = g(\vec x) = f(\epsilon ,\vec x) = f(X(\succ i z,w;x),\vec x)$.
+		\item
+		If  $|\succ i z| > |w|-|x|$ then $X(\succ i z,w;x) \neq \epsilon$ and
+%		, moreover, by the inductive hypothesis $F(z,w;x,\vec x) = f(X(z,w;x),\vec x)$. Thus, 
+so:
+		\[
+		\begin{array}{rcll}
+		F(\succ i z,w;x,\vec x) & = & h'(w;I(z,w;x),X(z,w;x),\vec x,F(z,w;x,\vec x)) &  \text{by \eqref{eqn:srn-mimics-brn}} \\
+		& = &  h(I(z,w;x),X(z,w;x),\vec x,F(z,w;x,\vec x)) & \text{by inductive hypothesis}\\
+		& = & h(I(z,w;x),X(z,w;x),\vec x,f(X(z,w;x),\vec x)) & \text{by subinductive hypothesis}\\
+		& = & f(X(\succ i z,w;x),\vec x) & \text{by definition of $f$.}\qedhere
+		\end{array}		
+		\] 
+	\end{itemize}
+\end{proof}
+
+
+\begin{proposition}
+	\label{prop:unibc-contains-unicob}
+	If $f(\vec x)$ in $\unicob$, then we have $f(\vec x; ) \in \unibc$.
+\end{proposition}
+
+\begin{proof}
+	%	[of Prop.~\ref{prop:unibc-contains-unicob}]
+	For $f$ in  $\unicob$, recalling that $\unicob\subseteq\unicob'$, take $f'\in \unibc$ and a polynomial $p_f$ given by Lemma~\ref{lem:safe-normal-bounding} above. It suffices to prove that there exists $r\in \unibc$ such that $|r(\vec x;)|\geq p_f (|\vec x|)$, for all $\vec x$, whence we have $f' (r(\vec x;);\vec x) = f(\vec x)$ as required, cf.~Lemma~\ref{lem:safe-normal-bounding} above.
+%	
+	For this we simply notice that the usual definitions of polynomial growth rate functions, e.g.\ from \cite{BelCoo92}, can be conducted in unary, using only uniform recursion. Namely, define $\oplus$ and $\otimes$ in $\unibc$ as follows, by $\uni\srn$, 
+	\[
+	\begin{array}{rcl}
+	\oplus (\epsilon ; y) & \dfn & y \\
+	\oplus (\succ i x ; y) & \dfn & \succ 1 (\oplus(x ; y) ) 
+	\end{array}
+	\qquad
+	\begin{array}{rcl}
+	\otimes (\epsilon , y ; ) & \dfn & \epsilon \\
+	\otimes (\succ i x , y; ) & \dfn & \oplus ( y ; \otimes(x;y) )
+	\end{array}
+	\]
+	%	$\oplus (\epsilon ; y) = y$ and 
+	%	$\oplus (s_i x ; y) = s_1 (\oplus (x;y))$, 
+	%	$\otimes (\epsilon ,y;) = \epsilon$ and 
+	%	$\otimes(s_i x , y;) = \oplus (y;\otimes(x;y))$.
+	so that $|\oplus(x;y)|=|x|+|y|$ and $|\otimes (x,y;)|=|x|\times |y|$. 
+	By safe composition we may also write $\oplus(x,y;)$ in $\unibc$, yielding an appropriate function $r(\vec x ; ) \in \unibc$. 
+\end{proof}
+
+As a consequence of Props.~\ref{prop:unicob-contains-unibc} and \ref{prop:unibc-contains-unicob} in this section, and Thms.~\ref{thm:posfp-contains-unicob} and \ref{thm:unicob-contains-posfp} earlier, we summarise the contributions of this work in the following characterisation:
+
+\begin{theorem}
+	\label{thm:unibc-eq-unicob}
+	$\unibc = \unicob = \posfp$.
+\end{theorem}
+
+
+\todo{a similar statement for logspace? Maybe Bellantoni's characterisation or Isabel's later one?}
+
+
+
+
+\section{Nondeterminism and alternation in machine models}
+
+
+
+\subsection{Monotone nondeterministic and alternating machines}
+
+Equivaence of (A), (B) and (C) definitions.
+
+Theorem: mAL = mP
+
+
+\subsection{NP and PSPACE}
+as an exercise, we show that...
+
+\subsection{ALOGSPACE and P}
+
+\subsection{NL}
+Grigni already showed that mNL does not coincide with co-mNL, unlike in the nonmonotone world, so we have no good function algebra for NL.
+Nonetheless, we can still speak of the functions bitwise computable in mNL (which will be a monotone function class), or also the function class mL(mNL, co-mNL).
+(We know that the latter is strictly stronger than the former.)
+
+\section{A similar treatment for ALOGTIME}
+\todo{Do we include this or defer to a new paper?}
+
+\subsection{Random access}
+Can have a version where we only query once, machine is otherwise unchanged.
+\anupam{Should also work for the logtime-hierarchy, where exactly $\Delta_0$ uniformity is needed. Here the length-algebra will be the rudimentary functions.}
+
+\subsection{Adapting the previous arguments}
+
+monotone formulae = pos ARATMs in log-time = 4-uBRN
+
+Length algebra will have 4-BR, which corresponds to ALINTIME.
+
+
+
+%% ============= section 8 =================
+
+\section{Conclusions}
+\label{sect:concs}
+In this work we observed that characterisations of `positive' polynomial-time computation in \cite{LautemannSS96:on-pos-p} are similarly robust in the functional setting. 
+We gave a function algebra $\unicob$ for $\posfp$ by \emph{uniformising} the recursion scheme in Cobham's characterisation for $\fptime$, and gave a characterisation based on safe recursion too.
+We also observed that the tally functions of $\posfp$ are precisely the unary encodings of $\flinspace$ functions on $\nat$.
+% as a corollary, we also have that the tally sets of $\posp$ are precisely the unary encodings of $\linspace$ predicates.
+
+$\unicob$ has a natural generalisation for arbitrary ordered alphabets, not just $\bool$. This is similarly the case for the circuit families and machine model we presented in Sect.~\ref{sect:posfp}.
+We believe these, again, induce the same class of functions, and can even be embedded monotonically into $\bool$, thanks to appropriate variants of $\ubrn$ in $\unicob$, e.g.~Thm.~\ref{thm:sim-ubrn}.
+%\anupam{problem, not locally monotone! Is this a problem?}
+
+Unlike for non-monotone functions, there is an interesting divergence between the monotone functions on binary words and those on the integers.
+Viewing the latter as \emph{finite sets}, characterised by their binary representaion, we see that the notion of monotonicity induced by $\subseteq$ is actually more restrictive than the one studied here on binary words. For example, natural numbers of different lengths may be compared, and the $\bit$ function is no longer monotone. 
+In fact, a natural way to characterise such functions would be to \emph{further} uniformise recursion schemes, by also relating the base case to the inductive step, e.g.:
+\[
+\begin{array}{rcl}
+f(0, \vec x) & = & h(0, 0, \vec x , 0) \\
+f(\succ i x , \vec x) & = & h(i, x , \vec x , f(x, \vec x))
+\end{array}
+\]
+%Work towards a formulation of `positive' polynomial-time predicates and functions on $\nat$ is ongoing.
+Adapting such recursion schemes to provide a `natural' formulation of the positive polynomial-time predicates and functions on $\nat$ is the subject of ongoing work.
+
+Finally, this work serves as a stepping stone towards providing \emph{logical theories} whose provably recursive functions correspond to natural monotone complexity classes. \emph{Witnessing theorems} for logical theories typically compile to function algebras on the computation side, and in particular it would be interesting to see if existing theories for monotone \emph{proof complexity} from \cite{Das16} appropriately characterise positive complexity classes.
+We aim to explore this direction in future work.
+
+%\newpage
+
+\paragraph*{Acknowledgements}
+The authors would like to thank Patrick Baillot, Sam Buss, Reinhard Kahle and the anonymous reviewers for several helpful discussions on this subject.
+
+
+
+\bibliographystyle{alpha}% the recommnded bibstyle
+\bibliography{monotone}
+
+%
+
+
+
+\appendix
+
+
+\todo{Bring proofs from the appendix into the article at appropriate places. (Check them first!)}
+\section{Appendix: proofs and examples} %%============= APPENDIX
+\label{sect:app:prfs-ex}
+
+
+\subsection{Formal definition of circuit family from Ex.~\ref{ex:circuits-sort}}
+%We give a formal definition of the circuit family from Ex.~\ref{ex:circuits-sort}.
+
+
+Let $m = n+1$, and describe the circuit for sorting as follows:
+%	\todo{check bit numbering conventions, and left-right vs right-left parsing!}
+\begin{itemize}
+	\item The set of gates is $[0, 2m^2)$; i.e. $N = 2(n+1)^2$.
+	\item Intuitively, the circuit is divided into $m$ layers with $2m$ gates each; namely the $l$\textsuperscript{th} layer consists of the gates $[2lm, 2(l+1)m)$, for $l<m$. 
+	The values of the odd-numbered gates in the $l$\textsuperscript{th} layer will always read $\thresh(m-1,x^l) \cdot \cdots \cdot \thresh(0 , x^l)$; i.e.\ the value of the gate $2lm + 2i + 1$ will be $\thresh(i,x^l)$, for $i < m$.
+	\item The even-numbered gates are conjunctions and the odd-numbered gates are disjunctions; i.e. $D = \{ 2i+1 : i < m^2 \}$.
+	\item In each layer $l<m$, we have a single edge from the conjunction gate $2lm$ (which receives no inputs, so evaluates to $1$) to the disjunction gate $2lm+1$, ensuring that the gate $2lm+1$ has value $\thresh (0,x^l) =1$. I.e., for $0\leq l<m$ and $0<i<m$, we have $( 2lm, 2lm+1 ) \in E$.
+	\item In the $0$\textsuperscript{th} layer, there are no other edges present; the empty disjunction gates evaluate to $0$ so their values read $0^{m-1}1$, as required.
+	\item In the $(l+1)$\textsuperscript{th} layer, we implement the recurrence from \eqref{eqn:sorting-pos-recurrence}, for $0< i < m$: 
+	\begin{itemize}
+		\item The conjunction gate $2(l+1)m + 2i$ receives the input $x(l)$ and also an incoming edge from the gate $2lm + 2i-1$, whose value is $\thresh (i-1, x^l)$.
+		\item The disjunction gate $2(l+1)m + 2i + 1$ has incoming edges from the previous conjunction gate, $2(l+1)m + 2i$ as well as from the gate $2lm +2i + 1$, whose value is $\thresh (i, x^l)$; this ensures that the gate $2(l+1)m+2i+1$ has value $\thresh (i, x^{l+1}) $. 
+	\end{itemize}
+	I.e., for $0\leq l<m-1$ and $0<i<m$, we have $(l,2(l+1)m+2i) \in I $, $(2lm+2i-1,2(l+1)m + 2i) \in E$, $(2(l+1)m + 2i, 2(l+1)m + 2i + 1  ) \in E$, and $(2lm + 2i + 1, 2(l+1)m + 2i +1) \in E$.
+	\item Finally, we set $O$ to consist of the disjunction gates in the final $(m-1)$\textsuperscript{th} layer, except the one corresponding to $\thresh(0,x)$; i.e.\ $O = \{2m^2 -2i - 1 : 1\leq i< m \}$.
+\end{itemize}
+\smallskip
+Clearly, the circuit family described above is $\ptime$-uniform, and it is not hard to see that it is also $\Delta_0$-uniform, thanks to the following specification:
+\begin{itemize}
+	\item $N = 2(n+1)^2$ so is already a term.
+	\item $D(r, n ) $ is the formula $ \exists i < m^2 .\  r = 2i + 1$. 
+	\item $E(r,s,n)$ is the formula $ \exists l< m . (r = 2lm \wedge s = 2lm+1) \vee  \exists l < m-1 . \exists i\in (0,m). (r = 2lm+2i-1 \wedge s = 2(l+1)m +2i ) \vee (r = 2(l+1)m + 2i  \wedge s = 2(l+1)m+2i+1 ) \vee (r = 2lm +2i+1 \wedge s= 2(l+1)m +2i +1) )  ) $.
+	\item $I(l, n)$ is the formula $l < m-1 \wedge \exists i\in (0,m). s = 2(l+1)m + 2i $.
+	\item $O(r,n)$ is the formula $\exists i < m . (i\geq 1 \wedge r = 2m^2-2i-1)$.
+\end{itemize}
+
+%% ---------- PTM for sorting
+
+\subsection{Formal construction of PTM from Ex.~\ref{ex:machines-sort}}
+
+We give a formal description of a PTM for sorting. 
+% from Ex.~\ref{ex:machines-sort}. 
+We denote it by SORT, and it has 4 tapes. The content of the first tape is the input $x$, let us say  $x=i_1 \cdots i_n$ ($i_1 ,\cdots ,i_n \in\{ 0,1\}$). SORT inductively computes the sorted prefixes of x, halting when it sorts $x$ itself. This corresponds to the sequence $\thresh(n,x)\, \thresh(n-1,x) \cdots \thresh(1,x)$, where $\thresh$ is the threshold function. 
+We need to describe, for an arbitrary proper prefix $x^m =i_1 \cdots i_m$ ($1\leq m< n$) of $x$, how to compute $\thresh(m+1,x^{m+1})\, \thresh(m,x^{m+1}) \cdots \thresh(1,x^{m+1})$ from $\thresh(m,x^{m})\, \cdots \thresh(1,x^{m})$. From the definition of the $\thresh$ function one has that 
+\begin{equation}
+\label{eqn:or}
+\thresh(1, x^{m+1} )= i_{m+1} \vee \thresh(1,x^m ),
+\end{equation}
+for $1<j\leq m$ 
+\begin{equation}
+\label{eqn:andor}
+\thresh(j, x^{m+1} )= ( i_{m+1} \wedge \thresh(j-1,x^m ))\vee \thresh(j,x^m)
+\end{equation}
+and 
+\begin{equation}
+\label{eqn:and}
+\thresh(m+1, x^{m+1})=  i_{m+1} \wedge \thresh(m, x^m ).
+\end{equation}
+The machine SORT discards the case of $x=\epsilon$, copies $i_1$ on tapes 2-4, and moves the head of the first tape one cell to the right: 
+$$
+\begin{array}{ccccc|ccccc}
+s & \blank & \blank & \blank & \blank & H  & (\blank , -) & (\blank ,-) & (\blank ,-) & (\blank ,-)\\
+s & i_1 & \blank & \blank & \blank & q_\wedge & (i_1 ,\rightarrow) & (i_1 ,-) &  (i_1 ,-) &  (i_1 ,-)
+\end{array}
+$$
+Now we implement the inductive routine described above based on the following instructions ($i,j,k,l\in\{ 0,1\}$): 
+
+$AND_{1\wedge 2;4}$ reflects \eqref{eqn:and} (subsripts refer to input;output tapes)
+$$
+\begin{array}{ccccc|ccccc}
+q_\wedge & \blank & i & j & k & H  & (\blank ,-) & (i,-) & (j,-) & (k,- )\\
+q_\wedge & 0 & 0 & i & j & t  & (0,-) & (0,\rightarrow) & (i,-) & (0,\rightarrow )\\
+q_\wedge & 0 & 1 & i & j & t  & (0,-) & (0,\rightarrow) & (i,-) & (0,\rightarrow )\\
+q_\wedge & 1 & 0 & i & j & t  & (0,-) & (0,\rightarrow) & (i,-) & (0,\rightarrow )\\
+q_\wedge & 1 & 1 & i & j & t  & (0,-) & (0,\rightarrow) & (i,-) & (1,\rightarrow )\\
+\end{array}
+$$
+
+$TEST$ (test the current bit on tape 4)
+$$
+\begin{array}{ccccc|ccccc}
+t & i & j & k & \blank & q_\vee  & (i,-) & (j,-) & (k,-) & (\blank ,- )\\
+t & i & k & k & l & q_{\wedge\vee}  & (i,-) & (j,-) & (k,-) & (l,- )
+\end{array}
+$$
+
+$OR_{1\vee 3;4}$ reflects \eqref{eqn:or}
+$$
+\begin{array}{ccccc|ccccc}
+q_\vee & 0 & i & 0 & \blank & h  & (0,\rightarrow) & (i,-) & (0,\rightarrow) & (0,- )\\
+q_\vee & 0 & i & 1 & \blank & h  & (0,\rightarrow) & (i,-) & (1,\rightarrow) & (1,- )\\
+q_\vee & 1 & i & 0 & \blank & h  & (1,\rightarrow) & (i,-) & (0,\rightarrow) & (1,- )\\
+q_\vee & 1 & i & 1 & \blank & h  & (1,\rightarrow) & (i,-) & (1,\rightarrow) & (1,- )
+\end{array}
+$$
+
+$ANDOR_{(1\wedge 2)\vee 3 ;4}$ implements \eqref{eqn:andor}
+$$
+\begin{array}{ccccc|ccccc}
+q_{\wedge\vee} & 0 & 0 & 0 & i & t & (0,-) & (0,-) & (0,\rightarrow ) & (0,\rightarrow)\\
+q_{\wedge\vee} & 0 & 0 & 1 & i & t & (0,-) & (0,-) & (1,\rightarrow ) & (1,\rightarrow)\\
+q_{\wedge\vee} & 0 & 1 & 0 & i & t & (0,-) & (1,-) & (0,\rightarrow ) & (0,\rightarrow)\\
+q_{\wedge\vee} & 0 & 1 & 1 & i & t & (0,-) & (1,-) & (1,\rightarrow ) & (1,\rightarrow)\\
+q_{\wedge\vee} & 1 & 0 & 0 & i & t & (1,-) & (0,-) & (0,\rightarrow ) & (0,\rightarrow)\\
+q_{\wedge\vee} & 1 & 0 & 1 & i & t & (1,-) & (0,-) & (1,\rightarrow ) & (1,\rightarrow)\\
+q_{\wedge\vee} & 1 & 1 & 0 & i & t & (1,-) & (1,-) & (0,\rightarrow ) & (1,\rightarrow)\\
+q_{\wedge\vee} & 1 & 1 & 1 & i & t & (1,-) & (1,-) & (1,\rightarrow ) & (1,\rightarrow)\\
+\end{array}
+$$
+The machine halts if it reaches the state $H$, the state $h$ means that the routine is finished. In this case, one tests the current cell on the first tape. If it has $\blank$, then go to halting state $H$ (the output is the content of the last tape); otherwise clean tapes 2-3, copy on them the content of tape 4, and  move the heads of tapes 2-4 to the first bit, enter state $q_\wedge$ and repeat the routine above. The routine will be repeated $|x|$ times.
+
+\subsection{Further proof details for Thm.~\ref{thm:posfp-contains-unicob}}
+
+We give a definition of the machine $M$ from the proof of Thm.~\ref{thm:posfp-contains-unicob}.
+For $i_1 , i_2 , i_3 \in\{ 0,1 \}$, the transition function of $M$ is given by the following table:
+%\footnote{Here we give only the `accessible' part of the program, and omit $(s, \triangleright, \triangleright, \triangleright) \mapsto (s, \triangleright, \rightarrow, \triangleright, \rightarrow, \triangleright, \rightarrow)$.} 
+
+$$\begin{array}{cccc|cccc}
+s & i_1 & \blank & \blank & h  & (i_1 ,\rightarrow )& (i_1 , - ) & (\blank, - )\\
+s & i_1 & i_2 & i_3 & s & (i_1 , - ) & (i_2 , - ) & (i_3 ,\rightarrow )\\
+s & i_1 & i_2 & \blank & q & (i_1 , \rightarrow ) & (i_1 , - ) & (i_2 ,- )\\
+q & i_1 & i_2 & i_3 & q & (i_1 , - ) & (i_2 , - ) & (i_3 ,\leftarrow )\\
+q & i_1 & i_2 & \triangleright & h & (i_1 , - ) & (i_2 , - ) & (\triangleright ,\rightarrow )\\
+s & \blank & \quad & \quad & H & \quad & \quad & \quad
+\end{array}
+$$.
+
+\begin{proof}
+	[Composition case for Thm.~\ref{thm:posfp-contains-unicob}]
+	
+	If $f$ is defined by composition: $f(\vec x )=h(g_1 (\vec x ),\cdots ,g_l (\vec x ))$, for $\vec x =(x_1 ,\cdots ,x_k )$. Notice that $h, g_1 ,\cdots ,g_l$ are funtions in $\unicob$ and recall that functions in $\unicob$ have the length of the outputs polynomially bounded on the length of the inputs. Let us say that for all $1\leq j\leq l$, $|g_j (\vec x )|\leq b(|\vec x |)$ for some polynomial $b$. By induction hypothesis, there are positive TM $M_{g_1} , \cdots , M_{g_l}$ and $M_{h}$ that compute, respectively, $g_1 , \cdots , g_l$ and $h$ in polynomial time on the length of the inputs. We denote such polynimials by $p_{g_1} , \cdots,p_{g_l}$ and $p_h$, respectively. Thus, the polynomial $p_h (b(|\vec x|), \cdots , b(|\vec x|))$ bounds the running time of $M_h$ on input $(g_1 (\vec x),\cdots ,g_l (\vec x ))$. We may assume, for simplicity, that the machines $M_{g_1}, \cdots ,M_{g_l}$ have all the same number of tapes, let us say $k+t+1$ tapes and that the first $k$ tapes are reading tapes. We may also assume that they halt scanning the first cell of each tape, having the tapes $k+1$ up to $k+t$ empty, and the output on tape $k+t+1$. Consider modified versions of such machines $M'_{g_j}$, with $k+t+l+u$ tapes (where $l+u$ is the number of tapes of $M_h$), working exactly as $M_{g_j}$ but writting the output on tape $k+t+j$ and not using the other last $l+u$ tapes (in particular, not changing theirs content). Morever, consider $M'_h$ to be $M_h$, but taking the tapes $k+t+1$ up to $k+t+l$ as input tapes, the last $u$ tapes as working tapes and output tape, and ignoring any other tape. We define a machine $M_f$, with $k+t+l+u$ tapes, which runs the machine $M'_h$ after having run sequentially the machines $M'_{g_j}$, for $j=1,\cdots ,l$. $M_f$ is a positive TM that computes the function $f$, and runs in polynomial time: $\Sigma_{j=1}^{l} p_{g_j}(|\vec x |)+ p_h (b(|\vec x|), \cdots , b(|\vec x|))$.
+\end{proof}
+
+
+\begin{proof}
+	[Alternative proof of Thm.~\ref{thm:posfp-contains-unicob} via circuits, sketch]
+	We use the characterisation \ref{item:p-uniform-posfp} from Thm.~\ref{thm:equiv-posfp} of $\posfp$ as $\ptime$-uniform $\neg$-free circuits.
+	We define circuits for $\unicob$ programs by induction on their structure, with polynomial-time constructibility implicit from their bounding functions; there will be no use of $\neg$ gates
+	due to the local properties of the programs.
+	We sketch the case of $\ubrn$ below.
+	
+	Suppose a function $f(x_1 , x_2, \dots , x_k)$ is defined by $\ubrn$ from $g(x_2, \dots , x_k)$ and $ h(x_0,x_1,x_2, \dots x_k, x_{k+1})$.
+	Let $C^g(\vec m) $ and $C^h(l, m , \vec m , n)$ be the associated circuit families, and let us write $C^g = (N^g, D^g, E^g, I^g_2, \dots , I^g_k ,O^g )$ and $C^h =(N^h, D^h , E^h , I^h_0, \dots , I^h_{k+1} , O^h)$. We define circuits $C^f(m, \vec m )$ for $f$ by induction on $m$.
+	The base case is easy, defining $C^f(0, \vec m)$ as $C^g (\vec m)$, with $I^f_1 (0, \vec m) \dfn \emptyset$.
+	
+	For the inductive step the idea is to take the circuit $C^f(m,\vec m)$ and annex to it the circuit $C^h(1, m , \vec m, |O^f (m, \vec m)|)$, joining up the appropriate gates and shifting all the gate numbers for edges, inputs and outputs of $C^h$ by the size of $C^f (m, \vec m)$.
+	We will suppress the inputs for the sets specifying $C^h$, since it is always used with arguments $(1,m,\vec m , |O^f (m, \vec m)|)$.
+	\begin{itemize}
+		\item $N^f (m+1, \vec m) \dfn N^f (m, \vec m) + N^h $.
+		\item $D^f (m+1 , \vec m) \dfn D^f (m, \vec m) \cup (D^h  + N^f (m, \vec m)  )$, where we write $S+n$ for $ \{ m +n: m \in S \}$.
+		\item $E^f (m+1 , \vec m) \dfn 
+		E^f (m , \vec m) 
+		\ \cup \ (E^h
+		%	(1 , m , \vec m , o) 
+		+ N^f (m, \vec m)) 
+		\ \cup\ 
+		\{ (n,n') : \text{$n$ is $l$\textsuperscript{th} output} \linebreak \text{of $O^f (m, \vec m)$ and $n' \in (I^h_{k+1}(l) + N^f(m, \vec m))$} \}
+		$, where we write $E+n $ for $\{ (m+n,m'+n) : (m , m') \in E \}$. 
+		%	and have construed $I_j$ as a function $ [n_j] \to \mathcal P ([N])$.
+		%	$$
+		%	\begin{array}{rl}
+		%	&E^f (m , \vec m) \\
+		%	\cup &(E^h(1 , m , \vec m , o) + N^f (m, \vec m)) \\
+		%	\cup & \{ (n,n') : \text{$n$ is $l$th output of $O^f (m, \vec m)$ and $n' \in (I^h_{k+1}(l) + N^f(m, \vec m))$} \}
+		%	\end{array}
+		%	$$
+		
+		\smallskip
+		
+		\item For $1<j\leq k$, $I^f_j (m+1, \vec m) (l) \dfn I^f_j (m,\vec m) (l) \cup ( I^h_j 
+		%	(1 , m , \vec m , o)
+		(l) + N^f (m, \vec m) )$.
+		\item For $l > 0$, $I^f_1 (m+1 , \vec m) (l) \dfn I^f_1 (m , \vec m) (l-1) \cup (I^h 
+		%	(1 , m , \vec m , o) 
+		(l-1) + N^f (m, \vec m) )$.
+		\item $I^f_1 (m+1, \vec m) (0) \dfn I^h_0 
+		%	(1 , m , \vec m , o)
+		(0) + N^f (m, \vec m) $.
+		\item $O^f(m+1, \vec m) \dfn O^h 
+		%	(1 , m , \vec m , o)
+		+ N^f (m, \vec m)$.
+		\qedhere
+	\end{itemize}
+\end{proof}
+
+
+
+
+\end{document}
